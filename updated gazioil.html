@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gazioil Trading Desk — Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#1a365d;--primary-hover:#15294a;--secondary:#2c5282;--accent:#d69e2e;--accent-soft:#fdf6e6;
+  --n0:#fff;--n50:#f8fafc;--n100:#f1f5f9;--n200:#e2e8f0;--n300:#cbd5e1;--n400:#94a3b8;--n500:#64748b;--n600:#475569;--n700:#334155;--n800:#1e293b;--n900:#0f172a;
+  --success:#16a34a;--success-bg:#dcfce7;--warning:#b45309;--warning-bg:#fef3c7;--danger:#dc2626;--danger-bg:#fee2e2;--info:#2563eb;--info-bg:#dbeafe;
+  --radius:10px;--shadow-sm:0 1px 2px rgba(15,23,42,.07);--shadow:0 1px 2px rgba(15,23,42,.06),0 10px 26px -14px rgba(15,23,42,.2);
+  --sans:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace;--topH:50px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);color:var(--n800);background:var(--n100);-webkit-font-smoothing:antialiased;line-height:1.45;font-size:14px}
+button{font-family:var(--sans);cursor:pointer}svg{display:block}
+
+.switcher{position:sticky;top:0;z-index:50;background:#10233f;color:#cdd9ea;display:flex;align-items:center;gap:8px;padding:9px 16px;white-space:nowrap;overflow-x:auto;border-bottom:1px solid rgba(255,255,255,.08);height:var(--topH)}
+.switcher .lbl{font:600 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#7e98ba;margin-right:6px;flex-shrink:0}
+.rchip{font:500 12.5px/1 var(--sans);padding:8px 13px;border-radius:7px;background:rgba(255,255,255,.06);color:#b9c8dd;border:1px solid transparent;flex-shrink:0}
+.rchip:hover{background:rgba(255,255,255,.12);color:#fff}
+.rchip.on{background:var(--accent);color:#1a365d;font-weight:600}
+.rchip.ds{border:1px dashed rgba(214,158,46,.5)}
+.rchip.ut{border:1px solid rgba(255,255,255,.14);color:#9fb3cf}
+.sw-div{width:1px;height:22px;background:rgba(255,255,255,.16);margin:0 4px;flex-shrink:0}
+.sw-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.sw-user{font:500 11px/1 var(--mono);color:#9fb3cf}
+.sw-out{font:600 11px/1 var(--mono);color:#cdd9ea;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);padding:6px 10px;border-radius:6px}
+.sw-out:hover{background:rgba(255,255,255,.16);color:#fff}
+
+.app{display:grid;grid-template-columns:236px 1fr;min-height:calc(100vh - var(--topH))}
+.sidebar{background:var(--primary);color:#cdd9ea;display:flex;flex-direction:column;position:sticky;top:var(--topH);align-self:start;height:calc(100vh - var(--topH));overflow:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:20px 22px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand-mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#b9831f);display:grid;place-items:center;color:#1a365d;font-weight:700;font-size:18px;flex-shrink:0}
+.brand-name{font-weight:700;font-size:16px;color:#fff}
+.brand-sub{font:500 9px/1 var(--mono);letter-spacing:.16em;color:var(--accent);margin-top:3px}
+.nav-group{padding:14px 14px 2px}
+.nav-group-t{font:600 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#5e7aa0;padding:0 10px 9px}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:#b9c8dd;margin-bottom:2px;user-select:none}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-item.active{background:var(--secondary);color:#fff}
+.nav-item .ic{width:18px;text-align:center;flex-shrink:0}
+.nav-item .nbadge{margin-left:auto;background:var(--accent);color:#1a365d;font:700 10px/1 var(--mono);padding:3px 6px;border-radius:20px}
+.nav-spacer{flex:1}
+.nav-foot{padding:14px 24px 16px;border-top:1px solid rgba(255,255,255,.08);margin:8px 14px 0;display:flex;align-items:center;gap:10px}
+.nav-foot .ava{width:30px;height:30px;border-radius:8px;background:var(--secondary);display:grid;place-items:center;color:#fff;font-weight:600;font-size:12px;flex-shrink:0}
+.nav-foot .nm{font-size:12.5px;font-weight:600;color:#fff}
+.nav-foot .rl{font:500 10px/1 var(--mono);color:#7e98ba;margin-top:2px}
+
+.main{display:flex;flex-direction:column;background:var(--n50);min-width:0}
+.topbar{height:58px;background:var(--n0);border-bottom:1px solid var(--n200);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:var(--topH);z-index:20}
+.crumb{font-size:13px;color:var(--n500)}.crumb b{color:var(--n800);font-weight:600}
+.searchbar{margin-left:6px;flex:1;max-width:380px;height:36px;background:var(--n100);border:1px solid var(--n200);border-radius:9px;display:flex;align-items:center;gap:9px;padding:0 12px;color:var(--n400);font-size:13px}
+.searchbar input{border:none;background:none;outline:none;flex:1;font-size:13px;color:var(--n700);font-family:var(--sans)}
+.tb-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+.icon-btn{width:36px;height:36px;border-radius:9px;border:1px solid var(--n200);background:var(--n0);display:grid;place-items:center;color:var(--n500);position:relative}
+.icon-btn:hover{background:var(--n100)}
+.icon-btn .ping{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--danger);border:2px solid #fff}
+.content{padding:24px}
+
+.page-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px}
+.page-head h1{font-size:22px;font-weight:700;letter-spacing:-.01em;color:var(--n900)}
+.page-head p{font-size:13.5px;color:var(--n500);margin-top:4px}
+.ph-actions{margin-left:auto;display:flex;gap:10px;align-items:center}
+
+.btn{height:38px;padding:0 15px;border-radius:9px;font-size:13.5px;font-weight:600;border:1px solid transparent;display:inline-flex;align-items:center;gap:7px}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-hover)}
+.btn-accent{background:var(--accent);color:#1a365d}.btn-accent:hover{filter:brightness(.96)}
+.btn-ghost{background:var(--n0);color:var(--n700);border-color:var(--n300)}.btn-ghost:hover{background:var(--n100)}
+.btn-danger{background:var(--danger-bg);color:#b91c1c;border-color:#fca5a5}.btn-danger:hover{background:#fdd}
+.btn-sm{height:32px;padding:0 12px;font-size:12.5px;border-radius:8px}.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+.badge-st{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:20px;font:600 11.5px/1 var(--sans);white-space:nowrap}
+.badge-st .d{width:6px;height:6px;border-radius:50%}
+.b-info{background:var(--info-bg);color:#1d4ed8}.b-info .d{background:#1d4ed8}
+.b-ok{background:var(--success-bg);color:#15803d}.b-ok .d{background:#16a34a}
+.b-warn{background:var(--warning-bg);color:#92400e}.b-warn .d{background:#b45309}
+.b-dang{background:var(--danger-bg);color:#b91c1c}.b-dang .d{background:#dc2626}
+.b-neut{background:var(--n100);color:var(--n600)}.b-neut .d{background:var(--n400)}
+.b-gold{background:var(--accent-soft);color:#92702a}.b-gold .d{background:var(--accent)}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.kpi{background:var(--n0);border:1px solid var(--n200);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow-sm)}
+.kpi .lbl{font:500 11px/1 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--n500);display:flex;align-items:center;gap:8px}
+.kpi .pin{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-size:13px}
+.kpi .val{font-size:26px;font-weight:700;color:var(--n900);margin-top:10px;font-family:var(--mono)}
+.kpi .delta{font-size:12px;margin-top:6px;font-weight:500}.up{color:var(--success)}.down{color:var(--danger)}
+
+.panel{background:var(--n0);border:1px solid var(--n200);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden}
+.panel-h{padding:14px 18px;border-bottom:1px solid var(--n200);display:flex;align-items:center;gap:10px}
+.panel-h h3{font-size:14.5px;font-weight:600;color:var(--n800)}
+.panel-h .link{margin-left:auto;font-size:12.5px;color:var(--secondary);font-weight:600;cursor:pointer}
+.panel-h .muted{margin-left:auto;font:500 11px/1 var(--mono);color:var(--n400)}
+
+table{width:100%;border-collapse:collapse}
+thead th{font:600 10.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--n500);text-align:left;padding:11px 18px;background:var(--n50);border-bottom:1px solid var(--n200)}
+tbody td{padding:12px 18px;font-size:13px;border-bottom:1px solid var(--n100);color:var(--n700)}
+tbody tr:last-child td{border-bottom:none}tbody tr:hover{background:var(--n50)}
+.num{font-family:var(--mono);text-align:right;font-size:12.5px;color:var(--n800)}.thr{text-align:right}
+.tid{font-family:var(--mono);font-size:12px;color:var(--secondary);font-weight:500}
+.prod{font-weight:600;color:var(--n900)}.muted{color:var(--n400);font-size:11.5px}.clickrow{cursor:pointer}
+
+.grid-2{display:grid;grid-template-columns:1.6fr 1fr;gap:18px}
+.grid-2b{display:grid;grid-template-columns:1fr 360px;gap:18px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+
+.tl{padding:8px 20px 16px}
+.tl-item{display:grid;grid-template-columns:30px 1fr;gap:14px}
+.tl-item:not(:last-child){padding-bottom:16px}
+.tl-rail{display:flex;flex-direction:column;align-items:center}
+.tl-node{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;z-index:1;font-size:13px}
+.tl-line{width:2px;flex:1;background:var(--n200);margin-top:2px}
+.tl-done .tl-node{background:var(--success-bg);color:var(--success);border:1.5px solid #86efac}
+.tl-now .tl-node{background:var(--primary);color:#fff;box-shadow:0 0 0 4px rgba(26,54,93,.12)}
+.tl-next .tl-node{background:var(--n100);color:var(--n400);border:1.5px dashed var(--n300)}
+.tl-body .t{font-size:13.5px;font-weight:600;color:var(--n800)}.tl-body .t.dim{color:var(--n400)}
+.tl-body .m{font-size:12px;color:var(--n500);margin-top:3px}
+.tl-meta{display:flex;align-items:center;gap:10px;margin-top:7px;flex-wrap:wrap}
+.hashchip{font:500 10.5px/1 var(--mono);color:var(--n500);background:var(--n100);border:1px solid var(--n200);border-radius:6px;padding:4px 7px;display:inline-flex;align-items:center;gap:5px}
+.hashchip .lk{width:4px;height:4px;border-radius:50%;background:var(--success)}
+.tstamp{font:500 11px/1 var(--mono);color:var(--n400)}
+
+.sum{padding:6px 18px 12px}
+.sum-row{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--n100);font-size:13px}
+.sum-row:last-child{border-bottom:none}.sum-row .k{color:var(--n500)}
+.sum-row .v{font-weight:600;color:var(--n800);font-family:var(--mono);font-size:12.5px}
+.sum-hero{background:linear-gradient(135deg,#1a365d,#2c5282);color:#fff;padding:18px;border-radius:var(--radius);margin-bottom:16px}
+.sum-hero .lbl{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#a8c0dd}
+.sum-hero .big{font-size:29px;font-weight:700;font-family:var(--mono);margin-top:6px}
+.sum-hero .sm{font-size:12px;color:#bcd0e8;margin-top:4px}
+
+.doc{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--n100)}
+.doc:last-child{border:none}
+.doc .fic{width:34px;height:34px;border-radius:8px;background:var(--info-bg);color:var(--info);display:grid;place-items:center;flex-shrink:0;font-size:15px}
+.doc .nm{font-size:13px;font-weight:600;color:var(--n800)}.doc .tg{font:500 10.5px/1 var(--mono);color:var(--n500);margin-top:2px}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 18px;padding:20px}
+.field{display:flex;flex-direction:column}.field.full{grid-column:1/-1}
+.field label{font-size:12.5px;font-weight:600;color:var(--n600);margin-bottom:7px}
+.input,select.input,textarea.input{height:42px;border:1px solid var(--n300);border-radius:9px;padding:0 13px;font-size:13.5px;font-family:var(--sans);color:var(--n800);background:var(--n0);width:100%}
+textarea.input{height:auto;padding:11px 13px;resize:vertical;line-height:1.5}
+.input:focus{outline:none;border-color:var(--secondary);box-shadow:0 0 0 3px rgba(44,82,130,.15)}
+.hint{font:500 11px/1.4 var(--mono);color:var(--n400);margin-top:6px}
+.form-foot{display:flex;justify-content:flex-end;gap:10px;padding:16px 20px;border-top:1px solid var(--n200);background:var(--n50)}
+.calc{background:var(--accent-soft);border:1px solid #f0dca6;border-radius:9px;padding:13px 15px;display:flex;justify-content:space-between;align-items:center}
+.calc .l{font:500 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:#92702a}
+.calc .v{font-size:20px;font-weight:700;font-family:var(--mono);color:#1a365d}
+
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--n200);padding:0 4px;margin-bottom:18px}
+.tab{padding:11px 14px;font-size:13px;font-weight:600;color:var(--n500);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab:hover{color:var(--n700)}.tab.on{color:var(--primary);border-color:var(--accent)}
+
+.kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.kcol{background:var(--n100);border-radius:var(--radius);padding:10px;min-height:200px}
+.kcol-h{font:600 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--n500);padding:4px 6px 10px;display:flex;justify-content:space-between}
+.kcard{background:var(--n0);border:1px solid var(--n200);border-radius:9px;padding:11px;margin-bottom:9px;box-shadow:var(--shadow-sm);cursor:pointer}
+.kcard:hover{border-color:var(--secondary)}
+.kcard .pid{font:500 10.5px/1 var(--mono);color:var(--secondary)}
+.kcard .pn{font-size:12.5px;font-weight:600;color:var(--n800);margin:5px 0 7px}
+.kcard .pv{font:500 11px/1 var(--mono);color:var(--n500)}
+
+.docpaper{background:var(--n0);border:1px solid var(--n200);border-radius:var(--radius);padding:34px 40px;box-shadow:var(--shadow-sm);max-width:760px}
+.docpaper h2{font-size:18px;color:var(--n900);text-align:center;margin-bottom:4px}
+.docpaper .dsub{text-align:center;font:500 11px/1 var(--mono);color:var(--n400);margin-bottom:22px}
+.docpaper p{font-size:13px;color:var(--n600);line-height:1.7;margin-bottom:13px}
+.sigbox{margin-top:22px;border-top:1px dashed var(--n300);padding-top:18px;display:flex;align-items:center;gap:14px}
+.sigpad{flex:1;height:60px;border:1.5px dashed var(--n300);border-radius:9px;display:grid;place-items:center;color:var(--n400);font-style:italic;font-size:14px}
+.sigpad.signed{border-style:solid;border-color:var(--success);color:var(--primary);font-family:var(--mono);font-style:normal;font-weight:600}
+
+.progress{height:7px;background:var(--n200);border-radius:20px;overflow:hidden}
+.progress .bar{height:100%;background:linear-gradient(90deg,var(--success),#22c55e);border-radius:20px}
+.kyc-check{display:flex;align-items:center;gap:13px;padding:13px 18px;border-bottom:1px solid var(--n100)}
+.kyc-check .ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex-shrink:0;font-size:15px}
+.kyc-check .nm{font-size:13px;font-weight:600;color:var(--n800)}.kyc-check .ds{font-size:11.5px;color:var(--n500);margin-top:2px}
+
+.notif{display:flex;gap:13px;padding:14px 18px;border-bottom:1px solid var(--n100)}
+.notif .ni{width:36px;height:36px;border-radius:9px;display:grid;place-items:center;flex-shrink:0;font-size:15px}
+.notif .nt{font-size:13px;color:var(--n800)}.notif .nt b{font-weight:600}
+.notif .nm2{font:500 11px/1 var(--mono);color:var(--n400);margin-top:4px}
+.notif.unread{background:var(--accent-soft)}
+
+.thread{display:flex;flex-direction:column;gap:14px;padding:18px;max-height:520px;overflow:auto}
+.bub{max-width:72%;padding:11px 14px;border-radius:13px;font-size:13px;line-height:1.5}
+.bub .who{font:600 10.5px/1 var(--mono);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;opacity:.7}
+.bub.them{background:var(--n100);color:var(--n800);border-bottom-left-radius:4px;align-self:flex-start}
+.bub.me{background:var(--primary);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+.bub .ts2{font-size:10px;opacity:.6;margin-top:5px;text-align:right}
+.composer{display:flex;gap:10px;padding:14px 18px;border-top:1px solid var(--n200);background:var(--n50)}
+.composer input{flex:1}
+
+/* login screen */
+.auth{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--n200);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);min-height:560px}
+.auth-art{background:radial-gradient(120% 120% at 20% 10%,#2c5282,#1a365d 55%,#10233f);color:#fff;padding:46px 44px;display:flex;flex-direction:column}
+.auth-tag{font:600 11px/1 var(--mono);letter-spacing:.16em;color:var(--accent);text-transform:uppercase;margin-top:auto}
+.auth-h{font-size:30px;font-weight:700;line-height:1.2;margin-top:14px;letter-spacing:-.02em}
+.auth-p{font-size:14px;color:#bcd0e8;margin-top:14px;max-width:360px}
+.auth-stats{display:flex;gap:28px;margin-top:24px}
+.auth-stats .v{font-size:21px;font-weight:700;font-family:var(--mono)}
+.auth-stats .l{font:500 10px/1.3 var(--mono);color:#8fabcf;text-transform:uppercase;margin-top:4px}
+.auth-form{padding:46px 48px;display:flex;flex-direction:column;justify-content:center;background:var(--n0)}
+.auth-err{background:var(--danger-bg);color:#b91c1c;border:1px solid #fca5a5;border-radius:9px;padding:10px 13px;font-size:12.5px;margin-bottom:14px;font-weight:500}
+.auth-switch{font-size:12.5px;color:var(--n500);margin-top:18px;text-align:center}
+.auth-switch a{color:var(--secondary);font-weight:600;cursor:pointer}
+.auth-switch a:hover{text-decoration:underline}
+.pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+.pill{font:500 11px/1 var(--mono);padding:6px 9px;border-radius:7px;background:var(--n100);color:var(--n600);border:1px solid var(--n200);cursor:pointer}
+.pill:hover{background:var(--n200)}
+
+/* mobile (inspector) */
+.mobile-wrap{min-height:calc(100vh - var(--topH));background:#0d1c33;display:flex;align-items:flex-start;justify-content:center;gap:40px;flex-wrap:wrap;padding:40px 30px;overflow:auto}
+.phone{width:390px;height:720px;flex-shrink:0;background:var(--n50);border-radius:36px;border:10px solid #0a1626;box-shadow:0 30px 70px -20px rgba(0,0,0,.6);overflow:hidden;display:flex;flex-direction:column;position:relative}
+.phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:130px;height:24px;background:#0a1626;border-radius:0 0 16px 16px;z-index:5}
+.m-top{background:var(--primary);color:#fff;padding:30px 18px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.m-top .brand-mark{width:30px;height:30px;font-size:15px}
+.m-top .tt{font-size:15px;font-weight:700}.m-top .ts{font:500 9px/1 var(--mono);color:var(--accent);letter-spacing:.12em;margin-top:2px}
+.m-body{flex:1;overflow:auto;padding:16px}
+.m-card{background:var(--n0);border:1px solid var(--n200);border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
+.m-card .pid{font:500 10.5px/1 var(--mono);color:var(--secondary)}.m-card .pn{font-size:15px;font-weight:700;color:var(--n900);margin:6px 0 3px}.m-card .pr{font-size:12px;color:var(--n500)}
+.m-field{margin-bottom:13px}.m-field label{font-size:12px;font-weight:600;color:var(--n600);display:block;margin-bottom:6px}
+.m-tabbar{display:flex;background:var(--n0);border-top:1px solid var(--n200);flex-shrink:0}
+.m-tab{flex:1;text-align:center;padding:11px 0 14px;font-size:10px;font-weight:600;color:var(--n400)}
+.m-tab.on{color:var(--primary)}.m-tab .mi{font-size:18px;display:block;margin-bottom:3px}
+.m-note{background:#0a1626;color:#9fb3cf;border-radius:14px;padding:18px;max-width:300px;font-size:13px;line-height:1.6;align-self:center}.m-note b{color:#fff}
+
+/* design system */
+.ds-wrap{padding:30px;background:var(--n100);min-height:calc(100vh - var(--topH))}
+.ds-card{background:var(--n0);border:1px solid var(--n200);border-radius:14px;box-shadow:var(--shadow-sm);max-width:1200px;margin:0 auto;padding:32px}
+.ds-sec{margin-bottom:32px}
+.ds-sec>h4{font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--n500);margin-bottom:16px;padding-bottom:9px;border-bottom:1px solid var(--n200)}
+.swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+.sw{border-radius:9px;overflow:hidden;border:1px solid var(--n200)}.sw .chip{height:58px}.sw .meta{padding:8px 9px;background:#fff}
+.sw .nm{font-size:11.5px;font-weight:600;color:var(--n800)}.sw .hx{font:500 10.5px/1 var(--mono);color:var(--n500);margin-top:2px}
+.type-row{display:flex;align-items:baseline;gap:18px;padding:10px 0;border-bottom:1px solid var(--n100)}
+.type-row .tk{font:500 11px/1 var(--mono);color:var(--n400);width:120px;flex-shrink:0}
+.bwrap{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.states{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.states h5{font:600 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--secondary);margin-bottom:11px}
+.states .badge-st{margin-bottom:8px;display:flex;width:fit-content}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--n900);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 12px 30px -8px rgba(0,0,0,.4);opacity:0;transition:.25s;z-index:100;display:flex;align-items:center;gap:10px;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.toast .tk{color:var(--accent);font-size:16px}
+.toast.err .tk{color:#fca5a5}
+.empty{padding:40px;text-align:center;color:var(--n400);font-size:13px}
+
+/* loading / states added for live data */
+.spin{width:18px;height:18px;border:2px solid var(--n200);border-top-color:var(--secondary);border-radius:50%;display:inline-block;animation:sp .7s linear infinite;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+.loadwrap{display:flex;align-items:center;justify-content:center;gap:10px;padding:48px;color:var(--n500);font-size:13px}
+.errwrap{margin:0;padding:18px;background:var(--danger-bg);border:1px solid #fca5a5;border-radius:var(--radius);color:#b91c1c;font-size:13px;display:flex;gap:10px;align-items:flex-start}
+.errwrap b{display:block;margin-bottom:3px}
+.rawbox{margin-top:12px;background:var(--n900);color:#cbd5e1;border-radius:9px;padding:13px 15px;font:500 11px/1.5 var(--mono);max-height:240px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+.skel{background:linear-gradient(90deg,var(--n100),var(--n200),var(--n100));background-size:200% 100%;animation:sh 1.2s infinite;border-radius:6px;height:13px}
+@keyframes sh{to{background-position:-200% 0}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="toast" id="toast"></div>
+<script>
+/* ============================================================
+   GAZIOIL — live API integration (single-file)
+   Base API: https://api.gazioil.space/api/v1  (JWT Bearer)
+   Wired against OpenAPI 2.26.9. Response bodies are untyped in
+   the spec, so deal fields are read defensively via adapters
+   below. Use the "raw" toggle on the Deal screen to confirm
+   exact field names, then tighten the adapters in one pass.
+   ============================================================ */
+
+/* ---------- safe storage (works as a downloaded file; degrades to memory) ---------- */
+var MEM={};
+var store={
+  get:function(k){try{return localStorage.getItem(k);}catch(e){return MEM[k]||null;}},
+  set:function(k,v){try{localStorage.setItem(k,v);}catch(e){MEM[k]=v;}},
+  del:function(k){try{localStorage.removeItem(k);}catch(e){delete MEM[k];}}
+};
+
+/* ---------- API client ---------- */
+var API={
+  base:'https://api.gazioil.space/api/v1',
+_proxy:'https://corsproxy.io/?',
+  token:store.get('gz_token')||'',
+  refreshTok:store.get('gz_refresh')||'',
+  setTokens:function(t,r){this.token=t||'';if(t)store.set('gz_token',t);if(r){this.refreshTok=r;store.set('gz_refresh',r);}},
+  clear:function(){this.token='';this.refreshTok='';store.del('gz_token');store.del('gz_refresh');store.del('gz_me');},
+  qs:function(q){if(!q)return '';var p=[];for(var k in q){if(q[k]===undefined||q[k]===null||q[k]==='')continue;p.push(encodeURIComponent(k)+'='+encodeURIComponent(q[k]));}return p.length?('?'+p.join('&')):'';},
+  req:function(method,path,opts){
+    opts=opts||{};var self=this;
+   var url=this._proxy+encodeURIComponent(this.base+path+this.qs(opts.query));
+    var h={};
+    if(this.token)h['Authorization']='Bearer '+this.token;
+    var fo={method:method,headers:h};
+    if(opts.form){fo.body=opts.form;}            // FormData: let browser set content-type
+    else if(opts.body!==undefined){h['Content-Type']='application/json';fo.body=JSON.stringify(opts.body);}
+    return fetch(url,fo).then(function(res){
+      if(res.status===401 && self.refreshTok && !opts._retried){
+        return self.doRefresh().then(function(ok){
+          if(ok){opts._retried=true;return self.req(method,path,opts);}
+          throw {status:401,detail:'Session expired — please sign in again.'};
+        });
+      }
+      var ct=res.headers.get('content-type')||'';
+      var isJson=ct.indexOf('application/json')>=0;
+      return (isJson?res.json().catch(function(){return null;}):res.text()).then(function(data){
+        if(!res.ok){
+          var d=(data&&(data.detail||data.message))||('HTTP '+res.status);
+          if(typeof d!=='string')d=JSON.stringify(d);
+          throw {status:res.status,detail:d,request_id:data&&data.request_id,raw:data};
+        }
+        return data;
+      });
+    }).catch(function(e){
+      if(e&&e.status!==undefined)throw e; // real HTTP error from above
+      // native fetch rejection = network/CORS/unreachable, never reached the server
+      throw {status:0,network:true,detail:'Could not reach the API server. This is a network or CORS issue \u2014 not your password. Use \u201CTest API connection\u201D on the sign-in screen to pinpoint it.'};
+    });
+  },
+  get:function(p,query){return this.req('GET',p,{query:query});},
+  post:function(p,body){return this.req('POST',p,{body:body});},
+  put:function(p,body){return this.req('PUT',p,{body:body});},
+  patch:function(p,body){return this.req('PATCH',p,{body:body});},
+  del:function(p){return this.req('DELETE',p);},
+  postForm:function(p,form){return this.req('POST',p,{form:form});},
+  doRefresh:function(){
+    var self=this;
+    return fetch(this._proxy+encodeURIComponent(this.base+'/auth/refresh'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refresh_token:this.refreshTok})})
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(d){if(d&&(d.token||d.access_token)){self.setTokens(d.token||d.access_token,d.refresh_token||self.refreshTok);return true;}return false;})
+      .catch(function(){return false;});
+  },
+  login:function(email,password){
+    var self=this;
+    return this.post('/auth/login',{email:email,password:password}).then(function(d){
+      // login may return {token,refresh_token} OR {mfa_required,mfa_token} OR {access_token}
+      if(d&&(d.mfa_required||d.mfa_token)&&!(d.token||d.access_token)){return {mfa:true,mfa_token:d.mfa_token};}
+      self.setTokens(d.token||d.access_token,d.refresh_token);
+      return {mfa:false,data:d};
+    });
+  },
+  register:function(body){
+    var self=this;
+    // backend route is untyped/unknown; /auth/register is the FastAPI convention.
+    // If it auto-issues tokens we log in immediately, otherwise the caller routes to sign-in.
+    return this.post('/auth/register',body).then(function(d){
+      if(d&&(d.token||d.access_token)){self.setTokens(d.token||d.access_token,d.refresh_token);return {auto:true,data:d};}
+      return {auto:false,data:d};
+    });
+  },
+  mfaLogin:function(mfa_token,code){
+    var self=this;
+    return this.post('/auth/mfa/login',{mfa_token:mfa_token,totp_code:code}).then(function(d){
+      self.setTokens(d.token||d.access_token,d.refresh_token);return d;
+    });
+  },
+  me:function(){return this.get('/auth/me');}
+};
+
+/* ---------- helpers (markup) ---------- */
+function esc(s){if(s===undefined||s===null)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function badge(c,l){return '<span class="badge-st '+c+'"><span class="d"></span>'+esc(l)+'</span>';}
+function bell(n){var ping=(n>0)?'<span class="ping"></span>':'';return '<div class="icon-btn" data-screen="notifications">'+ping+'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>';}
+function search(p){return '<div class="searchbar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="globalSearch" placeholder="'+esc(p)+'"></div>';}
+function kpi(b,c,i,l,v,d,dc){return '<div class="kpi"><div class="lbl"><span class="pin" style="background:'+b+';color:'+c+'">'+i+'</span>'+esc(l)+'</div><div class="val">'+esc(v)+'</div><div class="delta '+(dc||'')+'">'+esc(d)+'</div></div>';}
+function panel(t,b,r){return '<div class="panel"><div class="panel-h"><h3>'+esc(t)+'</h3>'+(r||'')+'</div>'+b+'</div>';}
+function field(l,inner,h){return '<div class="field"><label>'+esc(l)+'</label>'+inner+(h?'<div class="hint">'+esc(h)+'</div>':'')+'</div>';}
+function ph(t,s,r){return '<div class="page-head"><div><h1>'+esc(t)+'</h1><p>'+esc(s)+'</p></div>'+(r?'<div class="ph-actions">'+r+'</div>':'')+'</div>';}
+function topbar(c,a){return '<div class="topbar"><div class="crumb">'+c+'</div>'+(a||'')+'</div>';}
+function money(n){if(n===undefined||n===null||isNaN(n))return '—';return '$'+Number(n).toLocaleString('en-US',{maximumFractionDigits:0});}
+function num(n){if(n===undefined||n===null||isNaN(n))return '—';return Number(n).toLocaleString('en-US',{maximumFractionDigits:0});}
+function loading(label){return '<div class="loadwrap"><span class="spin"></span>'+esc(label||'Loading…')+'</div>';}
+function errBox(e){var d=(e&&e.detail)||'Request failed';var rid=(e&&e.request_id)?(' · '+e.request_id):'';return '<div class="errwrap"><span>⚠</span><div><b>Couldn\u2019t load from the API</b>'+esc(d)+'<span class="muted">'+esc(rid)+'</span></div></div>';}
+function emptyBox(t){return '<div class="empty">'+esc(t||'Nothing here yet.')+'</div>';}
+function rel(iso){if(!iso)return '';var t=new Date(iso).getTime();if(isNaN(t))return esc(iso);var s=(Date.now()-t)/1000;if(s<60)return 'just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
+function pick(resp){if(!resp)return [];if(Array.isArray(resp))return resp;if(Array.isArray(resp.items))return resp.items;if(Array.isArray(resp.results))return resp.results;if(Array.isArray(resp.data))return resp.data;return [];}
+function firstOf(o){var i;for(i=1;i<arguments.length;i++){var k=arguments[i];if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=='')return o[k];}return undefined;}
+
+/* ---------- deal adapters (defensive: response shapes untyped in spec) ---------- */
+function dealId(d){return firstOf(d,'id','deal_id','uuid')||'';}
+function dealRef(d){return firstOf(d,'deal_number','reference','code','ref','number')||(dealId(d)?String(dealId(d)).slice(0,8):'—');}
+function dealProduct(d){return firstOf(d,'product_type','product','grade')||'—';}
+function dealVolume(d){return firstOf(d,'contracted_volume','quantity_mt','volume','actual_volume','volume_mt');}
+function dealState(d){return firstOf(d,'state','status','deal_state')||'unknown';}
+function dealLoad(d){return firstOf(d,'load_port','loading_port','origin');}
+function dealDisch(d){return firstOf(d,'discharge_port','destination');}
+function dealRoute(d){var a=dealLoad(d),b=dealDisch(d);if(a&&b)return a+' \u2192 '+b;return a||b||'';}
+function dealUpdated(d){return firstOf(d,'updated_at','modified_at','created_at','loi_date');}
+function dealBuyer(d){return firstOf(d,'buyer_name','buyer','buyer_company','counterparty_name');}
+function dealSupplier(d){return firstOf(d,'supplier_name','supplier','supplier_company');}
+function dealPath(d){return firstOf(d,'payment_terms','payment','path')||'';}
+function legList(d){if(!d)return [];if(Array.isArray(d.legs))return d.legs;var L=[];if(d.buy_leg)L.push(Object.assign({side:'buy'},d.buy_leg));if(d.sell_leg)L.push(Object.assign({side:'sell'},d.sell_leg));return L;}
+function legPrice(leg){return firstOf(leg,'final_price','provisional_price','price','fixed_price');}
+function legSide(leg){return (firstOf(leg,'side','leg','leg_type')||'').toLowerCase();}
+function dealEconomics(d){
+  var legs=legList(d),buy=null,sell=null;
+  legs.forEach(function(l){var s=legSide(l);var p=legPrice(l);if(s.indexOf('buy')>=0&&p!=null)buy=Number(p);if(s.indexOf('sell')>=0&&p!=null)sell=Number(p);});
+  if(buy===null)buy=firstOf(d,'buy_price');if(sell===null)sell=firstOf(d,'sell_price');
+  var vol=Number(dealVolume(d))||0;
+  var comm=(buy!=null&&sell!=null)?(sell-buy)*vol:firstOf(d,'commission_amount','commission');
+  return {buy:buy,sell:sell,vol:vol,commission:(comm!=null?Number(comm):null)};
+}
+
+/* ---------- deal-state metadata (overridden by /config/states at boot if available) ---------- */
+var STATE_ORDER=['rfq','quoted','loi_received','offer_sent','offer_negotiating','offer_accepted','fco_issued','ncnda_signed','icpo_received','icpo_accepted','spa_signed','kyc_screening','lc_issued','lc_advised','inspection','price_fixation','pricing_settled','vessel_nominated','documents_presented','in_transit','delivered','payment_received','payment_settled','demurrage','commission_paid','closed'];
+var STATE_META={
+  rfq:{l:'RFQ',c:'b-neut'},quoted:{l:'Quoted',c:'b-info'},loi_received:{l:'LOI Received',c:'b-info'},
+  offer_sent:{l:'Offer Sent',c:'b-info'},offer_negotiating:{l:'Negotiating',c:'b-gold'},offer_accepted:{l:'Offer Accepted',c:'b-ok'},
+  fco_issued:{l:'FCO Issued',c:'b-info'},ncnda_signed:{l:'NCNDA Signed',c:'b-ok'},
+  icpo_received:{l:'ICPO Received',c:'b-info'},icpo_accepted:{l:'ICPO Accepted',c:'b-ok'},
+  spa_signed:{l:'SPA Signed',c:'b-ok'},kyc_screening:{l:'KYC Screening',c:'b-warn'},
+  lc_issued:{l:'LC Issued',c:'b-ok'},lc_advised:{l:'LC Advised',c:'b-info'},
+  inspection:{l:'Inspection',c:'b-info'},price_fixation:{l:'Price Fixation',c:'b-gold'},pricing_settled:{l:'Pricing Settled',c:'b-ok'},
+  vessel_nominated:{l:'Vessel Nominated',c:'b-info'},documents_presented:{l:'Documents Presented',c:'b-info'},
+  in_transit:{l:'In Transit',c:'b-info'},delivered:{l:'Delivered',c:'b-ok'},
+  payment_received:{l:'Payment Received',c:'b-ok'},payment_settled:{l:'Payment Settled',c:'b-ok'},
+  demurrage:{l:'Demurrage',c:'b-warn'},commission_paid:{l:'Commission Paid',c:'b-ok'},closed:{l:'Closed',c:'b-ok'},
+  cancelled:{l:'Cancelled',c:'b-neut'},disputed:{l:'Disputed',c:'b-dang'},under_arbitration:{l:'Arbitration',c:'b-dang'},force_majeure:{l:'Force Majeure',c:'b-dang'},
+  pending_admin_approval:{l:'Pending Approval',c:'b-warn'},pending_super_approval:{l:'Pending Approval',c:'b-warn'}
+};
+function stMeta(s){return STATE_META[s]||{l:(s||'unknown').replace(/_/g,' ').replace(/\b\w/g,function(m){return m.toUpperCase();}),c:'b-neut'};}
+function stateBadge(s){var m=stMeta(s);return badge(m.c,m.l);}
+function stateIndex(s){var i=STATE_ORDER.indexOf(s);return i;}
+
+/* ---------- app state + nav model ---------- */
+var STATE={role:null,screen:null,view:'login',signed:false,curDeal:null,
+  me:null,unread:0,
+  loading:false,error:null,    // current-screen async status
+  cache:{}                      // screen data cache keyed by screen name
+};
+var ME=null; // resolved profile
+
+/* role portals (frontend) — capabilities map to real endpoints in LOADERS/action */
+var ROLES=[
+ {key:'buyer',id:'buyer',portal:'BUYER PORTAL',def:'dashboard',
+   items:[['dashboard','\u25A4','Dashboard'],['loi','\uFF0B','Submit LOI'],['ncnda','\u270E','Sign NCNDA'],['icpo','\u2B06','Submit ICPO'],['delivery','\u2713','Confirm Delivery'],['disputes','\u2691','File Disputes']]},
+ {key:'supplier',id:'supplier',portal:'SUPPLIER PORTAL',def:'dashboard',
+   items:[['dashboard','\u25A4','Dashboard'],['rfqs','\u25F7','View RFQs'],['offer','\uFF0B','Submit Offers'],['confirmed','\u2713','Confirm Deals'],['docs','\u2B06','Upload Documents']]},
+ {key:'trader',id:'trader',portal:'TRADING DESK',def:'pipeline',
+   items:[['fco','\uFF0B','Issue FCO'],['pricing','\u21C4','Capture Prices'],['pipeline','\u25A6','Manage Transitions']]},
+ {key:'finance',id:'finance_officer',portal:'FINANCE',def:'commission',
+   items:[['commission','\u2211','Track Commissions'],['invoices','\uD83E\uDDFE','Generate Invoices'],['payments','\uD83D\uDCB3','Confirm Payments']]},
+ {key:'compliance',id:'compliance_officer',portal:'COMPLIANCE',def:'kyc',
+   items:[['kyc','\uD83D\uDEE1','Review KYC'],['audit','\u2261','Audit Logs'],['sanctions','\u2696','Sanctions Screening']]},
+ {key:'operations',id:'operations_manager',portal:'OPERATIONS',def:'lc',
+   items:[['lc','\uD83D\uDCD1','Manage LC'],['documents','\u25A2','Handle Documents'],['demurrage','\uD83D\uDEA2','Coordinate Demurrage']]},
+ {key:'inspector',id:'inspector',portal:'INSPECTOR',def:'jobs',mobile:true,
+   items:[['jobs','\uD83D\uDCF1','Inspection Reports']]},
+ {key:'managing_director',id:'managing_director',portal:'EXECUTIVE',def:'overview',
+   items:[['overview','\u25A4','Dashboard'],['users','\uD83D\uDC65','User Management'],['config','\u2699','Configuration'],['approvals','\u2713','Approvals']]}
+];
+var ROLEMAP={};ROLES.forEach(function(r){ROLEMAP[r.key]=r;});
+
+/* resolve backend role string -> frontend portal key */
+function resolvePortal(role){
+  role=(role||'').toLowerCase();
+  var map={buyer:'buyer',supplier:'supplier',
+    admin:'trader',agent:'trader',trader:'trader',
+    finance_officer:'finance',finance:'finance',
+    compliance_officer:'compliance',compliance:'compliance',
+    operations_manager:'operations',operations:'operations',ops:'operations',
+    inspector:'inspector',
+    super_admin:'managing_director',managing_director:'managing_director',md:'managing_director'};
+  return map[role]||'trader';
+}
+function meName(){if(!ME)return 'User';return firstOf(ME,'company_name','counterparty_name','name')||((firstOf(ME,'first_name')||'')+' '+(firstOf(ME,'last_name')||'')).trim()||firstOf(ME,'email')||'User';}
+function meRole(){return ME?(firstOf(ME,'role')||STATE.role):STATE.role;}
+function meInitials(){var n=meName();var p=n.split(/[\s@.]+/).filter(Boolean);return ((p[0]||'?')[0]+((p[1]||'')[0]||'')).toUpperCase();}
+
+var SCREENS={};
+var LOADERS={};   // screen -> async fn(role) that fills STATE.cache[screen] / sets STATE.error
+/* ---------- guard wrapper for async screens ---------- */
+function body(inner){return '<div class="content">'+inner+'</div>';}
+function guard(fn){if(STATE.loading)return loading();if(STATE.error)return errBox(STATE.error);try{return fn();}catch(e){return errBox({detail:'Render error: '+e.message});}}
+
+/* ================= AUTH (real) ================= */
+function connNote(){
+ var fileWarn=(location.protocol==='file:')?'<div class="auth-err" style="background:var(--warning-bg);color:var(--warning);border:none">You\u2019re opening this as a local file (file://). Browsers block API calls from file:// origins \u2014 this alone causes \u201CFailed to fetch\u201D. Serve it over http: run <b style="font-family:var(--mono)">python3 -m http.server</b> in this folder, then open <b style="font-family:var(--mono)">http://localhost:8000/gazioil-platform.html</b>.</div>':'';
+ return fileWarn+'<div id="connStatus" style="font-size:11.5px;color:var(--n400);margin-bottom:10px;line-height:1.5"></div>';
+}
+function renderLogin(){
+ var err=STATE.error?('<div class="auth-err">'+esc(STATE.error.detail||STATE.error)+'</div>'):'';
+ return '<div class="main" style="background:var(--n50)">'+topbar('<b>Sign in</b> \u00B7 platform entry','')+
+ '<div class="content"><div class="auth"><div class="auth-art"><div class="brand" style="border:none;padding:0"><div class="brand-mark">G</div><div><div class="brand-name">GAZIOIL</div><div class="brand-sub">TRADING DESK</div></div></div><div class="auth-tag">OMC Bilateral Trading Desk</div><div class="auth-h">The entire deal lifecycle.<br>One secure platform.</div><div class="auth-p">From Letter of Intent through price fixation to commission settlement \u2014 with a tamper-proof audit trail on every transition.</div><div class="auth-stats"><div><div class="v">300+</div><div class="l">API endpoints</div></div><div><div class="v">27</div><div class="l">Deal states</div></div><div><div class="v">8</div><div class="l">Roles \u00B7 RBAC</div></div></div></div>'+
+ '<div class="auth-form"><div style="font-size:22px;font-weight:700;color:var(--n900)">Sign in to your desk</div><p style="font-size:13px;color:var(--n500);margin:6px 0 18px">Live API \u00B7 api.gazioil.space \u2014 you are routed to your portal by role.</p>'+err+connNote()+
+ field('Work email','<input class="input" id="loginEmail" type="email" placeholder="you@company.com" autocomplete="username">')+
+ field('Password','<input class="input" id="loginPass" type="password" placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" autocomplete="current-password">')+
+ '<button class="btn btn-primary" id="loginBtn" style="width:100%;height:44px;margin-top:6px" data-action="signin">Sign in</button>'+
+ '<button class="btn btn-ghost" style="width:100%;margin-top:8px" data-action="ping">Test API connection</button>'+
+ '<div class="auth-switch">New to Gazioil? <a data-view="signup">Create an account</a></div></div></div></div></div>';
+}
+function renderSignup(){
+ var err=STATE.error?('<div class="auth-err">'+esc(STATE.error.detail||STATE.error)+'</div>'):'';
+ return '<div class="main" style="background:var(--n50)">'+topbar('<b>Create account</b> \u00B7 counterparty registration','')+
+ '<div class="content"><div class="auth"><div class="auth-art"><div class="brand" style="border:none;padding:0"><div class="brand-mark">G</div><div><div class="brand-name">GAZIOIL</div><div class="brand-sub">TRADING DESK</div></div></div><div class="auth-tag">OMC Bilateral Trading Desk</div><div class="auth-h">Register your company.<br>Start trading securely.</div><div class="auth-p">Create a counterparty account to submit Letters of Intent, respond to RFQs and track every deal through to settlement \u2014 all on a tamper-proof audit trail.</div><div class="auth-stats"><div><div class="v">KYC</div><div class="l">Verified onboarding</div></div><div><div class="v">SLA</div><div class="l">Desk-backed support</div></div></div></div>'+
+ '<div class="auth-form"><div style="font-size:22px;font-weight:700;color:var(--n900)">Create your account</div><p style="font-size:13px;color:var(--n500);margin:6px 0 18px">Register as a buyer or supplier. Your account is verified before trading is enabled.</p>'+err+connNote()+
+ field('Company name','<input class="input" id="su_company" type="text" placeholder="Your company Ltd." autocomplete="organization">')+
+ field('Contact name','<input class="input" id="su_contact" type="text" placeholder="Full name" autocomplete="name">')+
+ field('Work email','<input class="input" id="su_email" type="email" placeholder="you@company.com" autocomplete="username">')+
+ field('Account type','<select class="input" id="su_role"><option value="buyer">Buyer</option><option value="supplier">Supplier</option></select>','Staff roles are provisioned by the desk \u2014 not self-registered.')+
+ field('Country','<input class="input" id="su_country" type="text" placeholder="optional">')+
+ field('Password','<input class="input" id="su_pass" type="password" placeholder="At least 8 characters" autocomplete="new-password">')+
+ field('Confirm password','<input class="input" id="su_pass2" type="password" placeholder="Re-enter password" autocomplete="new-password">')+
+ '<button class="btn btn-primary" id="signupBtn" style="width:100%;height:44px;margin-top:6px" data-action="signup">Create account</button>'+
+ '<div class="auth-switch">Already have an account? <a data-view="login">Sign in</a></div></div></div></div></div>';
+}
+function renderMfa(){
+ var err=STATE.error?('<div class="auth-err">'+esc(STATE.error.detail||STATE.error)+'</div>'):'';
+ return '<div class="main" style="background:var(--n50)">'+topbar('<b>Two-factor</b> \u00B7 verification','')+
+ '<div class="content"><div class="panel" style="max-width:420px;margin:40px auto"><div class="panel-h"><h3>Enter your 6-digit code</h3></div><div style="padding:20px">'+err+
+ field('Authenticator code','<input class="input" id="mfaCode" inputmode="numeric" maxlength="6" placeholder="123456">','From your TOTP app')+
+ '<button class="btn btn-primary" style="width:100%;margin-top:8px" data-action="mfa-verify">Verify &amp; continue</button>'+
+ '<button class="btn btn-ghost" style="width:100%;margin-top:8px" data-action="logout">Back to sign in</button>'+
+ '</div></div></div></div>';
+}
+
+/* ================= SHARED ================= */
+SCREENS['shared/deal']=function(){
+ return topbar('Deal / <b>'+esc(STATE.curDeal?String(STATE.curDeal).slice(0,8):'')+'</b>',
+   '<div class="tb-actions">'+bell(STATE.unread)+'<button class="btn btn-ghost btn-sm" data-action="toggle-raw">'+(STATE.showRaw?'Hide raw':'Raw JSON')+'</button></div>')+
+ body(guard(function(){
+   var d=STATE.cache['deal'];if(!d)return emptyBox('Deal not found.');
+   var ec=dealEconomics(d);var cur=dealState(d);var idx=stateIndex(cur);
+   var tl='';
+   STATE_ORDER.forEach(function(s,i){
+     var done=(idx>=0&&i<idx),now=(i===idx);
+     var cl=done?'tl-done':(now?'tl-now':'tl-next');var ic=done?'\u2713':(now?'\u25CF':'\u25CB');
+     var meta=done?'<div class="tl-meta"><span class="hashchip"><span class="lk"></span>verified</span></div>':(now?'<div class="tl-meta">'+badge('b-warn','current')+'</div>':'');
+     tl+='<div class="tl-item '+cl+'"><div class="tl-rail"><div class="tl-node">'+ic+'</div>'+(i===STATE_ORDER.length-1?'':'<div class="tl-line"></div>')+'</div><div class="tl-body"><div class="t '+(i>idx&&idx>=0?'dim':'')+'">'+esc(stMeta(s).l)+'</div>'+meta+'</div></div>';
+   });
+   var isStaff=(STATE.role==='trader'||STATE.role==='managing_director');
+   var nextState=(idx>=0&&idx<STATE_ORDER.length-1)?STATE_ORDER[idx+1]:null;
+   var advance=isStaff&&nextState?'<button class="btn btn-primary btn-sm" data-action="advance" data-next="'+esc(nextState)+'">Advance \u2192 '+esc(stMeta(nextState).l)+'</button>':'';
+   var raw=STATE.showRaw?('<div class="rawbox">'+esc(JSON.stringify(d,null,2))+'</div>'):'';
+   var terms=[['Product',dealProduct(d)],['Volume',num(ec.vol)+' MT'],['Buy price',ec.buy!=null?('$'+ec.buy):'\u2014'],['Sell price',ec.sell!=null?('$'+ec.sell):'\u2014'],['Payment',dealPath(d)||'\u2014'],['Load',dealLoad(d)||'\u2014'],['Discharge',dealDisch(d)||'\u2014'],['Buyer',dealBuyer(d)||'\u2014'],['Supplier',dealSupplier(d)||'\u2014']];
+   return '<div style="margin-bottom:12px"><span class="muted" style="font-family:var(--mono)">'+esc(dealRef(d))+'</span> '+stateBadge(cur)+' '+advance+'</div>'+
+   '<div class="grid-2b"><div>'+ph(dealProduct(d)+' \u00B7 '+num(ec.vol)+' MT',dealRoute(d)||'\u2014')+
+   panel('Deal Timeline &amp; Audit Trail','<div class="tl">'+tl+'</div>',badge('b-ok','hash-chained'))+raw+'</div>'+
+   '<div><div class="sum-hero"><div class="lbl">OMC Commission</div><div class="big">'+money(ec.commission)+'</div><div class="sm">'+(ec.buy!=null&&ec.sell!=null?('Buy $'+ec.buy+' \u2192 Sell $'+ec.sell):'pending leg pricing')+'</div></div>'+
+   panel('Deal Terms','<div class="sum">'+terms.map(function(r){return '<div class="sum-row"><span class="k">'+esc(r[0])+'</span><span class="v">'+esc(r[1])+'</span></div>';}).join('')+'</div>')+
+   '<div style="margin-top:14px"><button class="btn btn-ghost btn-sm" data-screen="messages">Open messages</button> <button class="btn btn-ghost btn-sm" data-screen="documents">Documents</button></div></div></div>';
+ }));
+};
+LOADERS['deal']=function(){return API.get('/deals/'+STATE.curDeal).then(function(d){STATE.cache['deal']=d;});};
+
+SCREENS['shared/documents']=function(){
+ return topbar('Shared / <b>Documents</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   if(!STATE.curDeal)return emptyBox('Open a deal first to see its documents.');
+   var docs=pick(STATE.cache['documents']);
+   if(!docs.length)return panel('Documents',emptyBox('No documents uploaded for this deal yet.'));
+   return panel('Documents \u00B7 '+esc(String(STATE.curDeal).slice(0,8)),docs.map(function(x){
+     var nm=firstOf(x,'file_name','filename','name')||'document';
+     var tag=firstOf(x,'tag','doc_type','type')||'';
+     var verified=firstOf(x,'verified','is_verified');
+     return '<div class="doc"><div class="fic">\uD83D\uDCC4</div><div style="flex:1"><div class="nm">'+esc(nm)+'</div><div class="tg">tag: '+esc(tag)+'</div></div>'+badge(verified?'b-ok':'b-warn',verified?'Verified':'Review')+'</div>';
+   }).join(''));
+ }));
+};
+LOADERS['documents']=function(){if(!STATE.curDeal){STATE.cache['documents']=[];return Promise.resolve();}return API.get('/deals/'+STATE.curDeal+'/documents').then(function(d){STATE.cache['documents']=d;});};
+
+SCREENS['shared/notifications']=function(){
+ return topbar('Shared / <b>Notifications</b>','<div class="tb-actions"><button class="btn btn-ghost btn-sm" data-action="readall">Mark all read</button></div>')+
+ body(guard(function(){
+   var ns=pick(STATE.cache['notifications']);
+   if(!ns.length)return panel('Recent',emptyBox('No notifications.'));
+   return panel('Recent',ns.map(function(n){
+     var read=firstOf(n,'read','is_read');
+     var title=firstOf(n,'title','message','body','text')||'Notification';
+     var when=firstOf(n,'created_at','timestamp','sent_at');
+     return '<div class="notif '+(read?'':'unread')+'"><div class="ni" style="background:var(--info-bg);color:var(--info)">\u25CE</div><div style="flex:1"><div class="nt">'+esc(title)+'</div><div class="nm2">'+esc(rel(when))+'</div></div></div>';
+   }).join(''));
+ }));
+};
+LOADERS['notifications']=function(){return API.get('/notifications/in-app',{limit:50}).then(function(d){STATE.cache['notifications']=d;var arr=pick(d);STATE.unread=arr.filter(function(n){return !(firstOf(n,'read','is_read'));}).length;});};
+
+SCREENS['shared/messages']=function(){
+ return topbar('Messages / <b>'+esc(STATE.curDeal?String(STATE.curDeal).slice(0,8):'')+'</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   if(!STATE.curDeal)return emptyBox('Open a deal to view its message thread.');
+   var msgs=pick(STATE.cache['messages']);
+   var thread=msgs.length?msgs.map(function(m){
+     var who=firstOf(m,'sender_name','sender_role','sender','author')||'';
+     var mine=(firstOf(m,'sender_id')&&ME&&firstOf(m,'sender_id')===firstOf(ME,'id'));
+     var content=firstOf(m,'content','body','text')||'';
+     var when=firstOf(m,'created_at','sent_at');
+     return '<div class="bub '+(mine?'me':'them')+'"><div class="who">'+esc(who)+'</div>'+esc(content)+'<div class="ts2">'+esc(rel(when))+'</div></div>';
+   }).join(''):'<div class="empty">No messages yet \u2014 start the thread below.</div>';
+   return '<div class="panel"><div class="thread">'+thread+'</div><div class="composer"><input class="input" id="msgInput" placeholder="Write a message\u2026"><button class="btn btn-primary" data-action="send">Send</button></div></div>';
+ }));
+};
+LOADERS['messages']=function(){if(!STATE.curDeal){STATE.cache['messages']=[];return Promise.resolve();}return API.get('/messages/deal/'+STATE.curDeal,{limit:100}).then(function(d){STATE.cache['messages']=d;});};
+/* ---------- shared list renderers ---------- */
+function dealRows(list){
+ if(!list||!list.length)return '<tr><td colspan="5"><div class="empty">No deals.</div></td></tr>';
+ return list.map(function(d){var id=dealId(d);return '<tr class="clickrow" data-screen="deal" data-deal="'+esc(id)+'"><td class="tid">'+esc(dealRef(d))+'</td><td class="prod">'+esc(dealProduct(d))+'<div class="muted">'+esc(dealRoute(d))+'</div></td><td class="num">'+num(dealVolume(d))+' MT</td><td>'+stateBadge(dealState(d))+'</td><td class="muted">'+esc(rel(dealUpdated(d)))+'</td></tr>';}).join('');
+}
+function dealPicker(list,action,extra){
+ if(!list||!list.length)return '<div class="empty">No deals available.</div>';
+ return '<div style="margin-bottom:14px"><span class="muted" style="font-family:var(--mono)">Select deal:</span> '+list.map(function(d){var id=dealId(d);return '<button class="btn btn-ghost btn-sm" data-pickdeal="'+esc(id)+'" style="margin:0 4px 4px 0;'+(id===STATE.curDeal?'border-color:var(--secondary);color:var(--secondary)':'')+'">'+esc(dealRef(d))+'</button>';}).join('')+'</div>';
+}
+
+/* ================= BUYER ================= */
+SCREENS['buyer/dashboard']=function(){
+ return topbar('Buyer / <b>Dashboard</b>',search('Search deals, ports\u2026')+'<div class="tb-actions">'+bell(STATE.unread)+'<button class="btn btn-accent btn-sm" data-screen="loi">\uFF0B New LOI</button></div>')+
+ body(guard(function(){
+   var dash=STATE.cache['buyerDash']||{};var deals=pick(STATE.cache['buyerDeals']);
+   var k1=firstOf(dash,'active_deals','active','open_deals');
+   var k2=firstOf(dash,'total_volume','total_volume_mt','volume');
+   var k3=firstOf(dash,'awaiting_action','pending_actions','action_required');
+   var k4=firstOf(dash,'closed_ytd','closed','completed');
+   var kpis='<div class="kpi-row">'+
+     kpi('var(--info-bg)','var(--info)','\u25CE','Active Deals',k1!=null?num(k1):num(deals.length),'live','')+
+     kpi('var(--accent-soft)','#a87a1e','\u2211','Total Volume',k2!=null?num(k2):'\u2014','MT','')+
+     kpi('var(--warning-bg)','var(--warning)','!','Awaiting You',k3!=null?num(k3):'\u2014','actions','')+
+     kpi('var(--success-bg)','var(--success)','\u2713','Closed',k4!=null?num(k4):'\u2014','to date','')+'</div>';
+   return kpis+panel('Active Deals','<table><thead><tr><th>Deal</th><th>Product</th><th class="thr">Volume</th><th>Status</th><th>Updated</th></tr></thead><tbody>'+dealRows(deals.slice(0,8))+'</tbody></table>','<span class="link" data-screen="deals">All deals \u2192</span>');
+ }));
+};
+LOADERS['buyer/dashboard']=function(){return Promise.all([
+  API.get('/buyer/dashboard').catch(function(){return {};}),
+  API.get('/deals',{limit:50}).catch(function(){return {items:[]};})
+]).then(function(r){STATE.cache['buyerDash']=r[0];STATE.cache['buyerDeals']=r[1];});};
+
+SCREENS['buyer/deals']=function(){
+ return topbar('Buyer / <b>My Deals</b>',search('Filter deals\u2026')+'<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){var deals=pick(STATE.cache['buyerDeals']);return panel(deals.length+' deals','<table><thead><tr><th>Deal</th><th>Product</th><th class="thr">Volume</th><th>Status</th><th>Updated</th></tr></thead><tbody>'+dealRows(deals)+'</tbody></table>');}));
+};
+LOADERS['buyer/deals']=function(){return API.get('/deals',{limit:100}).then(function(d){STATE.cache['buyerDeals']=d;});};
+
+SCREENS['buyer/loi']=function(){
+ return topbar('Buyer / <b>New LOI</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   return ph('New Letter of Intent','Creates a deal in loi_received and notifies the desk. Validated against Incoterms 2020.')+
+   '<div class="panel" style="max-width:880px"><div class="form-grid">'+
+   field('Product type','<select class="input" id="loi_product"><option value="EN590">Diesel EN590</option><option value="Jet A-1">Jet A-1</option><option value="Crude Oil">Crude Oil</option><option value="Gasoline">Gasoline</option><option value="LNG">LNG</option></select>')+
+   field('Quantity (MT)','<input class="input" id="loi_qty" value="80000">')+
+   field('Incoterm','<select class="input" id="loi_incoterm"><option>CIF</option><option>FOB</option><option>CFR</option><option>DAP</option></select>')+
+   field('Payment terms','<select class="input" id="loi_payment"><option value="lc_at_sight">LC at sight</option><option value="tt">TT</option><option value="tt_advance">TT advance</option></select>')+
+   field('Load port','<input class="input" id="loi_load" placeholder="e.g. Rotterdam">')+
+   field('Discharge port','<input class="input" id="loi_disch" placeholder="e.g. Jakarta">')+
+   field('Target price (USD)','<input class="input" id="loi_target" placeholder="optional">','Indicative \u2014 final at fixation')+
+   field('Tolerance (%)','<input class="input" id="loi_tol" value="10">')+
+   '<div class="field full"><label>Notes to desk</label><textarea class="input" id="loi_notes" rows="3" placeholder="Commercial context\u2026"></textarea></div>'+
+   '</div><div class="form-foot"><button class="btn btn-ghost" data-screen="dashboard">Cancel</button><button class="btn btn-primary" data-action="loi">Submit LOI</button></div></div>';
+ }));
+};
+
+SCREENS['buyer/ncnda']=function(){
+ return topbar('Buyer / <b>Sign NCNDA</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var deals=pick(STATE.cache['buyerDeals']);
+   var picker=dealPicker(deals);
+   var signed=STATE.signed;
+   var sig=signed?'<div class="sigpad signed">'+esc(meName())+' \u2014 signed '+new Date().toLocaleDateString()+'</div>':'<div class="sigpad">Click \u201CSign electronically\u201D to apply signature</div>';
+   var canSign=!!STATE.curDeal;
+   return ph('Sign NCNDA','Non-Circumvention &amp; Non-Disclosure Agreement.',signed?badge('b-ok','Signed'):badge('b-warn','Awaiting signature'))+picker+
+   '<div class="docpaper"><h2>Non-Circumvention &amp; Non-Disclosure Agreement</h2><div class="dsub">GAZIOIL OMC \u00B7 '+esc(STATE.curDeal?String(STATE.curDeal).slice(0,8):'\u2014')+'</div><p>This Agreement is entered into between <b>'+esc(meName())+'</b> ("Buyer") and the OMC ("Broker") in connection with the referenced transaction.</p><p>The parties agree not to circumvent, avoid, or bypass one another to avoid payment of fees or commissions, for a period of twenty-four (24) months.</p><p>Each party shall hold in strict confidence all proprietary information, counterparty identities, pricing, and terms disclosed during the deal lifecycle.</p><div class="sigbox"><div style="font:600 11px/1 var(--mono);text-transform:uppercase;color:var(--n400)">Authorized<br>signatory</div>'+sig+'</div><div class="form-foot" style="border:none;background:none;padding:18px 0 0">'+(signed?'<button class="btn btn-primary" data-screen="deal" data-deal="'+esc(STATE.curDeal)+'">View deal \u2192</button>':'<button class="btn btn-primary" data-action="sign" '+(canSign?'':'disabled')+'>Sign electronically</button>')+'</div></div>';
+ }));
+};
+LOADERS['buyer/ncnda']=function(){STATE.signed=false;return API.get('/deals',{limit:100}).then(function(d){STATE.cache['buyerDeals']=d;});};
+
+SCREENS['buyer/icpo']=function(){
+ return topbar('Buyer / <b>Submit ICPO</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var deals=pick(STATE.cache['buyerDeals']);
+   return ph('Irrevocable Corporate Purchase Order','Submit your ICPO against an issued FCO \u2014 advances the deal state.')+dealPicker(deals)+
+   '<div class="panel" style="max-width:880px"><div class="form-grid">'+
+   field('Quantity (MT)','<input class="input" id="icpo_qty" value="120000">')+
+   field('Price (USD/unit)','<input class="input" id="icpo_price" value="82.95">')+
+   field('Issuing bank','<input class="input" id="icpo_bank" placeholder="Bank name">')+
+   field('Validity (days)','<input class="input" id="icpo_validity" value="30">')+
+   '</div><div class="form-foot"><button class="btn btn-ghost" data-screen="deals">Cancel</button><button class="btn btn-primary" data-action="icpo" '+(STATE.curDeal?'':'disabled')+'>Submit ICPO</button></div></div>';
+ }));
+};
+LOADERS['buyer/icpo']=function(){return API.get('/deals',{limit:100}).then(function(d){STATE.cache['buyerDeals']=d;});};
+
+SCREENS['buyer/delivery']=function(){
+ return topbar('Buyer / <b>Confirm Delivery</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var deals=pick(STATE.cache['buyerDeals']);
+   return ph('Confirm Delivery','Acknowledge cargo received at discharge \u2014 advances the deal toward settlement.')+dealPicker(deals)+
+   '<div class="panel" style="max-width:680px"><div class="form-grid"><div class="field full"><label>Confirmation notes</label><textarea class="input" id="del_notes" rows="3" placeholder="Outturn, quality, remarks\u2026"></textarea></div></div><div class="form-foot"><button class="btn btn-danger" data-screen="disputes">Raise dispute</button><button class="btn btn-primary" data-action="confirm-delivery" '+(STATE.curDeal?'':'disabled')+'>Confirm delivery</button></div></div>';
+ }));
+};
+LOADERS['buyer/delivery']=function(){return API.get('/deals',{limit:100}).then(function(d){STATE.cache['buyerDeals']=d;});};
+
+SCREENS['buyer/disputes']=function(){
+ return topbar('Buyer / <b>Disputes</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var deals=pick(STATE.cache['buyerDeals']);var disp=pick(STATE.cache['buyerDisputes']);
+   var rows=disp.length?disp.map(function(x){return '<tr><td class="tid">'+esc(firstOf(x,'reference','id','dispute_number')||'').toString().slice(0,8)+'</td><td class="prod">'+esc(firstOf(x,'deal_reference','deal_id')||'').toString().slice(0,8)+'</td><td>'+esc(firstOf(x,'dispute_type','type')||'')+'</td><td class="muted">'+esc(rel(firstOf(x,'created_at','filed_at')))+'</td><td>'+stateBadge(firstOf(x,'status','state'))+'</td></tr>';}).join(''):'<tr><td colspan="5"><div class="empty">No disputes filed.</div></td></tr>';
+   return ph('Disputes','Raise and track quality, quantity, payment, delivery or documentary disputes per deal.')+dealPicker(deals)+
+   '<div class="panel" style="max-width:880px;margin-bottom:16px"><div class="form-grid">'+
+   field('Type','<select class="input" id="disp_type"><option value="quantity">Quantity</option><option value="quality">Quality</option><option value="payment">Payment</option><option value="delivery">Delivery</option><option value="documentation">Documentation</option><option value="other">Other</option></select>')+
+   field('Claim amount (USD)','<input class="input" id="disp_amount" placeholder="optional">')+
+   '<div class="field full"><label>Reason</label><textarea class="input" id="disp_reason" rows="3" placeholder="Describe the dispute\u2026"></textarea></div>'+
+   '</div><div class="form-foot"><button class="btn btn-danger" data-action="dispute" '+(STATE.curDeal?'':'disabled')+'>File dispute</button></div></div>'+
+   panel('My disputes','<table><thead><tr><th>Ref</th><th>Deal</th><th>Type</th><th>Filed</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table>');
+ }));
+};
+LOADERS['buyer/disputes']=function(){return Promise.all([API.get('/deals',{limit:100}).catch(function(){return{items:[]};}),API.get('/buyer/disputes',{limit:50}).catch(function(){return{items:[]};})]).then(function(r){STATE.cache['buyerDeals']=r[0];STATE.cache['buyerDisputes']=r[1];});};
+/* ================= SUPPLIER ================= */
+function rfqRows(list){
+ if(!list||!list.length)return '<tr><td colspan="5"><div class="empty">No open RFQs.</div></td></tr>';
+ return list.map(function(d){var id=dealId(d);return '<tr class="clickrow" data-pickdeal="'+esc(id)+'" data-screen="offer"><td class="tid">'+esc(dealRef(d))+'</td><td class="prod">'+esc(dealProduct(d))+'</td><td class="num">'+num(dealVolume(d))+' MT</td><td class="muted">'+esc(dealLoad(d)||'\u2014')+'</td><td class="thr"><button class="btn btn-accent btn-sm" data-pickdeal="'+esc(id)+'" data-screen="offer">Offer</button></td></tr>';}).join('');
+}
+SCREENS['supplier/dashboard']=function(){
+ return topbar('Supplier / <b>Dashboard</b>',search('Search RFQs, deals\u2026')+'<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var dash=STATE.cache['supDash']||{};var rfqs=pick(STATE.cache['supRfqs']);var offers=pick(STATE.cache['supOffers']);
+   return '<div class="kpi-row">'+
+     kpi('var(--info-bg)','var(--info)','\u25F7','Open RFQs',num(firstOf(dash,'open_rfqs','rfqs')!=null?firstOf(dash,'open_rfqs','rfqs'):rfqs.length),'matched','')+
+     kpi('var(--accent-soft)','#a87a1e','\u25CE','Offers Out',num(firstOf(dash,'offers_out','pending_offers')!=null?firstOf(dash,'offers_out','pending_offers'):offers.filter(function(o){return (firstOf(o,'status')||'')==='pending';}).length),'pending','')+
+     kpi('var(--success-bg)','var(--success)','\u2713','Confirmed',num(firstOf(dash,'confirmed','won')||0),'deals','')+
+     kpi('var(--warning-bg)','var(--warning)','!','Docs Due',num(firstOf(dash,'docs_due','documents_due')||0),'uploads','')+'</div>'+
+   panel('Open RFQs','<table><thead><tr><th>RFQ</th><th>Product</th><th class="thr">Volume</th><th>Load</th><th></th></tr></thead><tbody>'+rfqRows(rfqs.slice(0,8))+'</tbody></table>','<span class="link" data-screen="rfqs">All RFQs \u2192</span>');
+ }));
+};
+LOADERS['supplier/dashboard']=function(){return Promise.all([API.get('/supplier/dashboard').catch(function(){return{};}),API.get('/supplier/rfqs',{limit:50}).catch(function(){return{items:[]};}),API.get('/supplier/offers',{limit:50}).catch(function(){return{items:[]};})]).then(function(r){STATE.cache['supDash']=r[0];STATE.cache['supRfqs']=r[1];STATE.cache['supOffers']=r[2];});};
+
+SCREENS['supplier/rfqs']=function(){
+ return topbar('Supplier / <b>Open RFQs</b>',search('Filter by product, port\u2026')+'<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){var rfqs=pick(STATE.cache['supRfqs']);return panel('Open Requests for Quote \u00B7 '+rfqs.length,'<table><thead><tr><th>RFQ</th><th>Product</th><th class="thr">Volume</th><th>Load</th><th></th></tr></thead><tbody>'+rfqRows(rfqs)+'</tbody></table>');}));
+};
+LOADERS['supplier/rfqs']=function(){return API.get('/supplier/rfqs',{limit:100}).then(function(d){STATE.cache['supRfqs']=d;});};
+
+SCREENS['supplier/offer']=function(){
+ return topbar('Supplier / <b>Submit Offer</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var rfqs=pick(STATE.cache['supRfqs']);
+   return ph('Submit Offer','Respond to an open RFQ with your pricing formula and terms.')+dealPicker(rfqs)+
+   '<div class="panel" style="max-width:880px"><div class="form-grid">'+
+   field('Pricing formula','<input class="input" id="off_formula" placeholder="e.g. Platts MOPAG + 12">','Required by the API')+
+   field('Differential (USD)','<input class="input" id="off_diff" placeholder="optional">')+
+   field('Incoterm','<select class="input" id="off_incoterm"><option>FOB</option><option>CIF</option><option>CFR</option></select>')+
+   field('Validity (days)','<input class="input" id="off_validity" value="5">')+
+   '<div class="field full"><label>Notes</label><textarea class="input" id="off_notes" rows="2" placeholder="Laycan, quality, remarks\u2026"></textarea></div>'+
+   '</div><div class="form-foot"><button class="btn btn-ghost" data-screen="rfqs">Cancel</button><button class="btn btn-primary" data-action="offer" '+(STATE.curDeal?'':'disabled')+'>Submit offer</button></div></div>';
+ }));
+};
+LOADERS['supplier/offer']=function(){return API.get('/supplier/rfqs',{limit:100}).then(function(d){STATE.cache['supRfqs']=d;});};
+
+SCREENS['supplier/myoffers']=function(){
+ return topbar('Supplier / <b>My Offers</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var offers=pick(STATE.cache['supOffers']);
+   var rows=offers.length?offers.map(function(o){var st=firstOf(o,'status','state')||'pending';var cls=st==='accepted'?'b-ok':(st==='rejected'?'b-dang':'b-info');return '<tr><td class="tid">'+esc(String(firstOf(o,'id','offer_id')||'').slice(0,8))+'</td><td class="tid">'+esc(String(firstOf(o,'deal_id','deal_reference')||'').slice(0,8))+'</td><td class="prod">'+esc(firstOf(o,'pricing_formula','product_type')||'')+'</td><td>'+badge(cls,st)+'</td></tr>';}).join(''):'<tr><td colspan="4"><div class="empty">No offers submitted.</div></td></tr>';
+   return panel('Offers','<table><thead><tr><th>Offer</th><th>Deal</th><th>Formula / Product</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table>');
+ }));
+};
+LOADERS['supplier/myoffers']=function(){return API.get('/supplier/offers',{limit:100}).then(function(d){STATE.cache['supOffers']=d;});};
+
+SCREENS['supplier/confirmed']=function(){
+ return topbar('Supplier / <b>Confirmed Deals</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){var deals=pick(STATE.cache['supDeals']);return panel('Confirmed','<table><thead><tr><th>Deal</th><th>Product</th><th class="thr">Volume</th><th>Status</th><th>Updated</th></tr></thead><tbody>'+dealRows(deals)+'</tbody></table>');}));
+};
+LOADERS['supplier/confirmed']=function(){return API.get('/deals',{limit:100}).then(function(d){STATE.cache['supDeals']=d;});};
+
+SCREENS['supplier/docs']=function(){
+ return topbar('Supplier / <b>Documents</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var deals=pick(STATE.cache['supDeals']);var docs=pick(STATE.cache['documents']);
+   var list=docs.length?docs.map(function(x){var nm=firstOf(x,'file_name','name')||'document';var tag=firstOf(x,'tag','doc_type')||'';return '<div class="doc"><div class="fic">\uD83D\uDCC4</div><div style="flex:1"><div class="nm">'+esc(nm)+'</div><div class="tg">tag: '+esc(tag)+'</div></div>'+badge('b-ok','Uploaded')+'</div>';}).join(''):'<div class="empty">No documents for the selected deal.</div>';
+   return ph('Documents','Upload POP, SGS certificates, bills of lading and allocation letters per deal.')+dealPicker(deals)+
+   '<div class="panel" style="max-width:880px;margin-bottom:16px"><div class="form-grid">'+
+   field('Document type / tag','<input class="input" id="sd_tag" placeholder="e.g. pop, sgs_quality, bl">')+
+   field('File','<input class="input" id="sd_file" type="file" style="padding:8px 13px">')+
+   '</div><div class="form-foot"><button class="btn btn-accent" data-action="upload-supplier-doc" '+(STATE.curDeal?'':'disabled')+'>\u2B06 Upload</button></div></div>'+
+   panel('Uploaded for this deal',list);
+ }));
+};
+LOADERS['supplier/docs']=function(){var p=[API.get('/deals',{limit:100}).catch(function(){return{items:[]};})];if(STATE.curDeal)p.push(API.get('/deals/'+STATE.curDeal+'/documents').catch(function(){return{items:[]};}));return Promise.all(p).then(function(r){STATE.cache['supDeals']=r[0];STATE.cache['documents']=r[1]||[];});};
+/* ================= TRADER / DESK ================= */
+SCREENS['trader/pipeline']=function(){
+ return topbar('Trader / <b>Deal Pipeline</b>','<div class="tb-actions">'+bell(STATE.unread)+'<button class="btn btn-accent btn-sm" data-screen="fco">\uFF0B Issue FCO</button></div>')+
+ body(guard(function(){
+   var deals=pick(STATE.cache['allDeals']);
+   var phases=[['Origination',['rfq','quoted','loi_received','offer_sent','offer_negotiating','offer_accepted']],
+     ['Compliance',['fco_issued','ncnda_signed','icpo_received','icpo_accepted','kyc_screening']],
+     ['Contracting',['spa_signed','lc_issued','lc_advised']],
+     ['Pricing',['inspection','price_fixation','pricing_settled']],
+     ['Logistics',['vessel_nominated','documents_presented','in_transit','delivered','payment_received','payment_settled','demurrage','commission_paid','closed']]];
+   var h='<div class="kanban">';
+   phases.forEach(function(p){var ds=deals.filter(function(d){return p[1].indexOf(dealState(d))>=0;});h+='<div class="kcol"><div class="kcol-h">'+p[0]+'<span>'+ds.length+'</span></div>'+ds.map(function(d){var id=dealId(d);return '<div class="kcard" data-screen="deal" data-deal="'+esc(id)+'"><div class="pid">'+esc(dealRef(d))+'</div><div class="pn">'+esc(dealProduct(d))+'</div><div class="pv">'+num(dealVolume(d))+' MT \u00B7 '+esc(stMeta(dealState(d)).l)+'</div></div>';}).join('')+'</div>';});
+   h+='</div>';
+   return ph('Deal Pipeline','27-state lifecycle grouped into 5 phases. Click any card to open the deal &amp; drive transitions.')+h;
+ }));
+};
+LOADERS['trader/pipeline']=function(){return API.get('/deals',{limit:200}).then(function(d){STATE.cache['allDeals']=d;});};
+
+SCREENS['trader/fco']=function(){
+ return topbar('Trader / <b>Issue FCO</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var deals=pick(STATE.cache['allDeals']).filter(function(d){return dealState(d)==='loi_received'||dealState(d)==='quoted';});
+   var sups=pick(STATE.cache['suppliers']);
+   var supOpts=sups.map(function(s){return '<option value="'+esc(firstOf(s,'id'))+'">'+esc(firstOf(s,'company_name','name'))+'</option>';}).join('')||'<option value="">No suppliers found</option>';
+   return ph('Issue Full Corporate Offer','Bind a supplier to a buyer LOI and set pricing formulas. Transitions the deal to fco_issued.')+dealPicker(deals)+
+   '<div class="panel" style="max-width:880px"><div class="form-grid">'+
+   field('Supplier','<select class="input" id="fco_supplier">'+supOpts+'</select>')+
+   field('Loading port','<input class="input" id="fco_load" placeholder="e.g. Rotterdam">')+
+   field('Buy pricing formula','<input class="input" id="fco_buy" placeholder="e.g. Platts MOPAG + 10">','Required')+
+   field('Sell pricing formula','<input class="input" id="fco_sell" placeholder="e.g. Platts MOPAG + 14">')+
+   field('Buy incoterm','<select class="input" id="fco_buyinc"><option>FOB</option><option>CIF</option></select>')+
+   field('Sell incoterm','<select class="input" id="fco_sellinc"><option>CIF</option><option>FOB</option></select>')+
+   '</div><div class="form-foot"><button class="btn btn-ghost" data-screen="pipeline">Cancel</button><button class="btn btn-primary" data-action="fco" '+(STATE.curDeal?'':'disabled')+'>Issue FCO</button></div></div>';
+ }));
+};
+LOADERS['trader/fco']=function(){return Promise.all([API.get('/deals',{limit:200}).catch(function(){return{items:[]};}),API.get('/counterparties',{type:'supplier',limit:200}).catch(function(){return{items:[]};})]).then(function(r){STATE.cache['allDeals']=r[0];STATE.cache['suppliers']=r[1];});};
+
+SCREENS['trader/pricing']=function(){
+ return topbar('Trader / <b>Price Fixation</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var deals=pick(STATE.cache['allDeals']);var benches=pick(STATE.cache['benchmarks']);
+   var legHint='';var legId='';
+   if(STATE.curDeal&&STATE.cache['deal']){var legs=legList(STATE.cache['deal']);if(legs.length){var sell=legs.filter(function(l){return legSide(l).indexOf('sell')>=0;})[0]||legs[0];legId=firstOf(sell,'id','leg_id')||'';legHint='Leg '+String(legId).slice(0,8)+' \u00B7 '+legSide(sell);}}
+   var bRows=benches.length?benches.slice(0,8).map(function(b){return '<div class="sum-row" style="padding:12px 18px"><span class="k">'+esc(firstOf(b,'benchmark','name'))+'</span><span class="v">$'+esc(firstOf(b,'value','price'))+'</span></div>';}).join(''):'<div class="empty">No benchmark data.</div>';
+   return ph('Price Fixation','Fix the final leg price \u2014 written immutably to the audit trail. Pick a deal to load its legs.')+dealPicker(deals)+
+   '<div class="grid-2"><div class="panel" style="align-self:start"><div class="panel-h"><h3>Fix price</h3>'+(legHint?'<span class="muted">'+esc(legHint)+'</span>':'')+'</div><div class="form-grid" style="grid-template-columns:1fr 1fr">'+
+   field('Final price','<input class="input" id="fix_price" placeholder="e.g. 82.95">')+
+   field('Fixation date','<input class="input" id="fix_date" type="date">')+
+   '<div class="field full"><label>Notes</label><textarea class="input" id="fix_notes" rows="2"></textarea></div>'+
+   '</div><div class="form-foot"><button class="btn btn-primary" data-action="fix" data-leg="'+esc(legId)+'" '+(legId?'':'disabled')+'>Capture &amp; lock price</button></div></div>'+
+   panel('Recorded benchmarks','<div style="padding:6px 0">'+bRows+'</div>')+'</div>';
+ }));
+};
+LOADERS['trader/pricing']=function(){var p=[API.get('/deals',{limit:200}).catch(function(){return{items:[]};}),API.get('/pricing/benchmarks',{}).catch(function(){return{items:[]};})];if(STATE.curDeal)p.push(API.get('/deals/'+STATE.curDeal).catch(function(){return null;}));return Promise.all(p).then(function(r){STATE.cache['allDeals']=r[0];STATE.cache['benchmarks']=r[1];if(r[2])STATE.cache['deal']=r[2];});};
+
+/* ================= FINANCE ================= */
+SCREENS['finance/commission']=function(){
+ return topbar('Finance / <b>Commission</b>',search('Search deals, legs\u2026')+'<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var comms=pick(STATE.cache['commissions']);var rep=STATE.cache['commReport']||{};
+   var rows=comms.length?comms.map(function(c){var amt=firstOf(c,'commission_amount','amount','total');var paid=firstOf(c,'paid_commission','paid_amount');var st=firstOf(c,'state','status')||(paid?'paid':'pending');return '<tr class="clickrow" data-screen="deal" data-deal="'+esc(firstOf(c,'deal_id')||'')+'"><td class="tid">'+esc(String(firstOf(c,'deal_reference','deal_id')||'').slice(0,8))+'</td><td class="num">$'+esc(firstOf(c,'rate')||'\u2014')+'</td><td class="num" style="color:var(--primary);font-weight:600">'+money(amt)+'</td><td class="num">'+money(paid)+'</td><td>'+stateBadge(st)+'</td></tr>';}).join(''):'<tr><td colspan="5"><div class="empty">No commission records.</div></td></tr>';
+   return ph('Commission Tracking','OMC spread per deal leg, payout status and totals.')+
+   '<div class="kpi-row">'+
+     kpi('var(--accent-soft)','#a87a1e','\u2211','Booked',money(firstOf(rep,'total_commission','booked','total')),'period','')+
+     kpi('var(--warning-bg)','var(--warning)','!','Outstanding',money(firstOf(rep,'outstanding','unpaid')),'','')+
+     kpi('var(--success-bg)','var(--success)','\u2713','Collected',money(firstOf(rep,'paid','collected')),'','')+
+     kpi('var(--info-bg)','var(--info)','\u25CE','Records',num(comms.length),'legs','')+'</div>'+
+   panel('Commission legs','<table><thead><tr><th>Deal</th><th class="thr">Rate</th><th class="thr">Commission</th><th class="thr">Paid</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table>');
+ }));
+};
+LOADERS['finance/commission']=function(){return Promise.all([API.get('/commissions',{limit:100}).catch(function(){return{items:[]};}),API.get('/reports/commissions',{}).catch(function(){return{};})]).then(function(r){STATE.cache['commissions']=r[0];STATE.cache['commReport']=r[1];});};
+
+SCREENS['finance/invoices']=function(){
+ return topbar('Finance / <b>Invoices</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var comms=pick(STATE.cache['commissions']);
+   var rows=comms.length?comms.map(function(c){var id=firstOf(c,'id');var inv=firstOf(c,'invoiced','is_invoiced');var amt=firstOf(c,'commission_amount','amount');return '<tr><td class="tid">'+esc(String(firstOf(c,'deal_reference','deal_id')||'').slice(0,8))+'</td><td class="num">'+money(amt)+'</td><td>'+badge(inv?'b-ok':'b-warn',inv?'Invoiced':'Draft')+'</td><td class="thr">'+(inv?'':'<button class="btn btn-ghost btn-sm" data-action="invoice" data-comm="'+esc(id)+'" data-deal="'+esc(firstOf(c,'deal_id')||'')+'">Issue</button>')+'</td></tr>';}).join(''):'<tr><td colspan="4"><div class="empty">No commissions to invoice.</div></td></tr>';
+   return ph('Generate Invoices','Commission invoices per deal \u2014 mark a commission invoiced or generate the deal invoice.')+
+   panel('Commission invoices','<table><thead><tr><th>Deal</th><th class="thr">Amount</th><th>Status</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>');
+ }));
+};
+LOADERS['finance/invoices']=function(){return API.get('/commissions',{limit:100}).then(function(d){STATE.cache['commissions']=d;});};
+
+SCREENS['finance/payments']=function(){
+ return topbar('Finance / <b>Confirm Payments</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var pays=pick(STATE.cache['payments']);
+   var rows=pays.length?pays.map(function(p){var st=firstOf(p,'status','state')||'pending';var cls=st==='confirmed'?'b-ok':(st==='failed'?'b-dang':'b-warn');var id=firstOf(p,'id','payment_id');return '<tr><td class="muted">'+esc(rel(firstOf(p,'created_at','paid_at')))+'</td><td class="tid">'+esc(String(firstOf(p,'deal_id')||'').slice(0,8))+'</td><td>'+esc(firstOf(p,'payment_method','method')||'')+'</td><td class="num">'+money(firstOf(p,'amount'))+'</td><td>'+badge(cls,st)+'</td><td class="thr">'+(st==='pending'?'<button class="btn btn-primary btn-sm" data-action="confirm-payment" data-pay="'+esc(id)+'">Confirm</button>':'')+'</td></tr>';}).join(''):'<tr><td colspan="6"><div class="empty">No payments.</div></td></tr>';
+   return ph('Confirm Payments','Reconcile inbound settlements against issued invoices.')+panel('Settlement ledger','<table><thead><tr><th>Date</th><th>Deal</th><th>Method</th><th class="thr">Amount</th><th>Status</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>');
+ }));
+};
+LOADERS['finance/payments']=function(){return API.get('/payments',{limit:100}).then(function(d){STATE.cache['payments']=d;});};
+/* ================= COMPLIANCE ================= */
+SCREENS['compliance/kyc']=function(){
+ return topbar('Compliance / <b>Review KYC</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var q=pick(STATE.cache['kycPending']);
+   if(!q.length)return panel('Review queue',emptyBox('No KYC checks pending review.'));
+   return ph('Review KYC','Pending counterparty verification \u2014 approve or reject each check.',badge('b-warn',q.length+' pending'))+
+   panel('Pending checks',q.map(function(c){var id=firstOf(c,'id','check_id');var nm=firstOf(c,'company_name','counterparty_name','name')||'Counterparty';var typ=firstOf(c,'counterparty_type','type','role')||'';return '<div class="kyc-check"><div class="ic" style="background:var(--info-bg);color:var(--info)">\uD83D\uDEE1</div><div style="flex:1"><div class="nm">'+esc(nm)+'</div><div class="ds">'+esc(typ)+' \u00B7 '+esc(String(id).slice(0,8))+'</div></div><button class="btn btn-ghost btn-sm" data-action="reject-kyc" data-check="'+esc(id)+'" style="margin-right:8px">Reject</button><button class="btn btn-primary btn-sm" data-action="approve-kyc" data-check="'+esc(id)+'">Approve</button></div>';}).join(''));
+ }));
+};
+LOADERS['compliance/kyc']=function(){return API.get('/kyc/admin/pending',{limit:100}).then(function(d){STATE.cache['kycPending']=d;});};
+
+SCREENS['compliance/sanctions']=function(){
+ return topbar('Compliance / <b>Sanctions Screening</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var hist=pick(STATE.cache['screenStatus']);
+   var rows=hist.length?hist.map(function(s){var hit=firstOf(s,'has_match','matched','hit');return '<div class="kyc-check"><div class="ic" style="background:'+(hit?'var(--warning-bg)':'var(--success-bg)')+';color:'+(hit?'var(--warning)':'var(--success)')+'">'+(hit?'!':'\u2713')+'</div><div style="flex:1"><div class="nm">'+esc(firstOf(s,'entity_name','name','query')||'Entity')+'</div><div class="ds">'+esc(firstOf(s,'lists','provider','source')||'OFAC \u00B7 EU \u00B7 UK \u00B7 UN')+' \u00B7 '+esc(rel(firstOf(s,'created_at','screened_at')))+'</div></div>'+badge(hit?'b-warn':'b-ok',hit?'Review':'Clear')+'</div>';}).join(''):'<div class="empty">No screening history.</div>';
+   return ph('Sanctions Screening','Automated OFAC / EU / UK / UN screening \u2014 run a check or review history.')+
+   '<div class="panel" style="max-width:880px;margin-bottom:16px"><div class="form-grid">'+
+   field('Entity / company name','<input class="input" id="scr_name" placeholder="Company to screen">')+
+   field('Country','<input class="input" id="scr_country" placeholder="optional">')+
+   '</div><div class="form-foot"><button class="btn btn-accent" data-action="screen">\u21BB Run screening</button></div></div>'+
+   panel('Screening history',rows);
+ }));
+};
+LOADERS['compliance/sanctions']=function(){return API.get('/kyc/screening-status',{limit:50}).then(function(d){STATE.cache['screenStatus']=d;});};
+
+SCREENS['compliance/audit']=function(){
+ return topbar('Compliance / <b>Audit Logs</b>',search('Search by entity, action\u2026')+'<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var logs=pick(STATE.cache['audit']);
+   var rows=logs.length?logs.map(function(l){return '<tr><td class="tid">'+esc(firstOf(l,'entity_type','entity')||'')+'</td><td>'+esc(firstOf(l,'action','event')||'')+'</td><td style="font-family:var(--mono);font-size:11.5px;color:var(--success)">'+esc(String(firstOf(l,'hash','chain_hash')||'').slice(0,12))+'</td><td class="muted">'+esc(firstOf(l,'actor','user','actor_email')||'system')+'</td><td class="muted">'+esc(rel(firstOf(l,'created_at','timestamp')))+'</td></tr>';}).join(''):'<tr><td colspan="5"><div class="empty">No audit entries.</div></td></tr>';
+   return ph('Audit Logs','Every state transition is hashed and chained \u2014 tamper-evident.')+panel('Audit entries \u00B7 '+logs.length,'<table><thead><tr><th>Entity</th><th>Action</th><th>Hash</th><th>Actor</th><th>When</th></tr></thead><tbody>'+rows+'</tbody></table>');
+ }));
+};
+LOADERS['compliance/audit']=function(){return API.get('/audit/logs',{limit:100}).then(function(d){STATE.cache['audit']=d;});};
+
+/* ================= OPERATIONS ================= */
+SCREENS['operations/lc']=function(){
+ return topbar('Operations / <b>LC Management</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var alerts=pick(STATE.cache['lcAlerts']);var deals=pick(STATE.cache['allDeals']);
+   var aRows=alerts.length?alerts.map(function(a){return '<div class="doc"><div class="fic" style="background:var(--warning-bg);color:var(--warning)">\uD83D\uDCD1</div><div style="flex:1"><div class="nm">'+esc(firstOf(a,'lc_number','reference')||'LC')+'</div><div class="tg">'+esc(firstOf(a,'message','status')||'')+' \u00B7 exp '+esc(firstOf(a,'expiry_date','expiry')||'')+'</div></div>'+badge('b-warn','Attention')+'</div>';}).join(''):'<div class="empty">No LC alerts.</div>';
+   return ph('Letter of Credit Management','Track issuance, expiry alerts and document presentation.')+dealPicker(deals)+
+   '<div class="grid-2"><div class="panel" style="align-self:start"><div class="panel-h"><h3>Record / issue LC</h3></div><div class="form-grid" style="grid-template-columns:1fr 1fr">'+
+   field('LC number','<input class="input" id="lc_number" placeholder="LC ref">')+
+   field('Issuing bank','<input class="input" id="lc_bank" placeholder="Bank name">')+
+   field('Beneficiary bank','<input class="input" id="lc_benbank" placeholder="Bank name">')+
+   field('Amount (USD)','<input class="input" id="lc_amount" placeholder="0">')+
+   field('Expiry date','<input class="input" id="lc_expiry" type="date">')+
+   field('Type','<select class="input" id="lc_type"><option value="irrevocable">Irrevocable</option><option value="transferable">Transferable</option></select>')+
+   '</div><div class="form-foot"><button class="btn btn-primary" data-action="lc" '+(STATE.curDeal?'':'disabled')+'>Record LC</button></div></div>'+
+   panel('Expiry &amp; alerts',aRows)+'</div>';
+ }));
+};
+LOADERS['operations/lc']=function(){return Promise.all([API.get('/lc-real/alerts').catch(function(){return{items:[]};}),API.get('/deals',{limit:200}).catch(function(){return{items:[]};})]).then(function(r){STATE.cache['lcAlerts']=r[0];STATE.cache['allDeals']=r[1];});};
+
+SCREENS['operations/documents']=function(){
+ return topbar('Operations / <b>Handle Documents</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var deals=pick(STATE.cache['allDeals']);var docs=pick(STATE.cache['documents']);
+   var list=docs.length?docs.map(function(x){var nm=firstOf(x,'file_name','name')||'document';var tag=firstOf(x,'tag','doc_type')||'';var v=firstOf(x,'verified','is_verified');return '<div class="doc"><div class="fic">\uD83D\uDCC4</div><div style="flex:1"><div class="nm">'+esc(nm)+'</div><div class="tg">tag: '+esc(tag)+'</div></div>'+badge(v?'b-ok':'b-warn',v?'Verified':'Pending')+'</div>';}).join(''):'<div class="empty">No documents for the selected deal.</div>';
+   return ph('Handle Documents','The document set required before settlement. Pick a deal, upload and tag.')+dealPicker(deals)+
+   '<div class="panel" style="max-width:880px;margin-bottom:16px"><div class="form-grid">'+
+   field('Tag','<input class="input" id="op_tag" placeholder="e.g. bl, ci, coo, sgs_quality">')+
+   field('File','<input class="input" id="op_file" type="file" style="padding:8px 13px">')+
+   '</div><div class="form-foot"><button class="btn btn-accent" data-action="upload-doc" '+(STATE.curDeal?'':'disabled')+'>\u2B06 Upload</button></div></div>'+
+   panel('Documents',list);
+ }));
+};
+LOADERS['operations/documents']=function(){var p=[API.get('/deals',{limit:200}).catch(function(){return{items:[]};})];if(STATE.curDeal)p.push(API.get('/deals/'+STATE.curDeal+'/documents').catch(function(){return{items:[]};}));return Promise.all(p).then(function(r){STATE.cache['allDeals']=r[0];STATE.cache['documents']=r[1]||[];});};
+
+SCREENS['operations/demurrage']=function(){
+ return topbar('Operations / <b>Demurrage</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var deals=pick(STATE.cache['allDeals']);var recs=pick(STATE.cache['demurrage']);
+   var rows=recs.length?recs.map(function(r){return '<tr><td class="prod">'+esc(firstOf(r,'vessel_name','vessel')||'\u2014')+'</td><td class="tid">'+esc(String(firstOf(r,'deal_id')||'').slice(0,8))+'</td><td class="num">'+esc(firstOf(r,'allowed_laytime_hours','laytime')||'\u2014')+'h</td><td class="num">'+money(firstOf(r,'demurrage_amount','amount'))+'</td><td>'+stateBadge(firstOf(r,'status','state'))+'</td></tr>';}).join(''):'<tr><td colspan="5"><div class="empty">No demurrage records for the selected deal.</div></td></tr>';
+   return ph('Coordinate Demurrage','Track laytime against allowed windows and calculate exposure.')+dealPicker(deals)+
+   panel('Laytime &amp; demurrage','<table><thead><tr><th>Vessel</th><th>Deal</th><th class="thr">Laytime</th><th class="thr">Exposure</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table>');
+ }));
+};
+LOADERS['operations/demurrage']=function(){var p=[API.get('/deals',{limit:200}).catch(function(){return{items:[]};})];if(STATE.curDeal)p.push(API.get('/demurrage/deals/'+STATE.curDeal).catch(function(){return{items:[]};}));return Promise.all(p).then(function(r){STATE.cache['allDeals']=r[0];STATE.cache['demurrage']=r[1]||[];});};
+
+/* ================= INSPECTOR (mobile) ================= */
+SCREENS['inspector/jobs']=function(){
+ return guard(function(){
+   var deals=pick(STATE.cache['inspJobs']);
+   if(!deals.length)return '<div class="m-card"><div class="pn">No jobs</div><div class="pr">No cargoes are currently awaiting inspection.</div></div>';
+   return deals.map(function(d){var id=dealId(d);
+     return '<div class="m-card" data-screen="report" data-deal="'+esc(id)+'"><div class="pid">'+esc(dealRef(d))+'</div><div class="pn">'+esc(dealProduct(d))+'</div><div class="pr">'+esc(dealRoute(d)||'\u2014')+' \u00B7 '+num(dealVolume(d))+' MT</div><div style="margin-top:9px">'+stateBadge(dealState(d))+'</div><div style="margin-top:11px"><button class="btn btn-primary" style="width:100%" data-screen="report" data-deal="'+esc(id)+'">Open inspection \u2192</button></div></div>';
+   }).join('');
+ });
+};
+LOADERS['inspector/jobs']=function(){return API.get('/deals',{limit:100}).then(function(d){STATE.cache['inspJobs']=d;});};
+
+SCREENS['inspector/report']=function(){
+ return guard(function(){
+   var d=STATE.cache['deal'];
+   if(!d)return '<div class="m-card"><div class="pn">Pick a job</div><div class="pr">Choose a cargo from the Jobs tab to file a report.</div><div style="margin-top:11px"><button class="btn btn-ghost" style="width:100%" data-screen="jobs">\u2190 Back to jobs</button></div></div>';
+   return '<div class="m-card"><div class="pid">'+esc(dealRef(d))+'</div><div class="pn">'+esc(dealProduct(d))+'</div><div class="pr">'+esc(dealRoute(d)||'\u2014')+' \u00B7 '+num(dealVolume(d))+' MT</div><div style="margin-top:9px">'+stateBadge(dealState(d))+'</div></div>'+
+   '<div class="m-card"><div style="font-weight:700;margin-bottom:12px;color:var(--n900)">Inspection report</div>'+
+   '<div class="m-field"><label>Observed quantity (MT)</label><input class="input" id="insp_qty" inputmode="decimal" placeholder="e.g. 79980"></div>'+
+   '<div class="m-field"><label>Quality result</label><select class="input" id="insp_quality"><option value="on_spec">On-spec / passed</option><option value="minor_deviation">Minor deviation</option><option value="off_spec">Off-spec / failed</option></select></div>'+
+   '<div class="m-field"><label>Notes / findings</label><textarea class="input" id="insp_notes" rows="3" placeholder="Density, temperature, seal numbers, observations\u2026"></textarea></div>'+
+   '<div class="m-field"><label>Inspection certificate</label><input class="input" id="insp_file" type="file" style="padding:8px 11px"></div>'+
+   '<button class="btn btn-primary" style="width:100%" data-action="inspect-submit">Submit report</button>'+
+   '<button class="btn btn-ghost" style="width:100%;margin-top:8px" data-screen="jobs">\u2190 Back to jobs</button>'+
+   '</div>';
+ });
+};
+LOADERS['inspector/report']=function(){if(!STATE.curDeal){STATE.cache['deal']=null;return Promise.resolve();}return API.get('/deals/'+STATE.curDeal).then(function(d){STATE.cache['deal']=d;});};
+
+/* ================= MANAGING DIRECTOR ================= */
+SCREENS['managing_director/overview']=function(){
+ return topbar('Executive / <b>Overview</b>',search('Search deals, counterparties\u2026')+'<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var dash=STATE.cache['adminDash']||{};var stats=STATE.cache['adminStats']||{};var deals=pick(STATE.cache['allDeals']);
+   var src=Object.keys(stats).length?stats:dash;
+   var totalDeals=firstOf(src,'total_deals','deals_total','deal_count')||deals.length;
+   var active=firstOf(src,'active_deals','open_deals','in_progress');
+   var commission=firstOf(src,'total_commission','commission_total','revenue','gross_commission');
+   var users=firstOf(src,'total_users','user_count','users');
+   var kpis='<div class="kpi-row">'+
+     kpi('var(--info-bg)','var(--info)','\u25A6','Total deals',num(totalDeals),'lifecycle','')+
+     kpi('var(--success-bg)','var(--success)','\u25CF','Active deals',active!=null?num(active):'\u2014','in progress','')+
+     kpi('var(--accent-soft)','var(--accent)','\u2211','Commission',commission!=null?money(commission):'\u2014','tracked','')+
+     kpi('var(--n200)','var(--n700)','\uD83D\uDC65','Counterparties',users!=null?num(users):'\u2014','onboarded','')+'</div>';
+   return ph('Executive Overview','Full-platform visibility \u2014 deals, revenue and approvals across every desk.')+kpis+
+     panel('Recent deals','<table><thead><tr><th>Deal</th><th>Product</th><th class="thr">Volume</th><th>Status</th><th>Updated</th></tr></thead><tbody>'+dealRows(deals.slice(0,12))+'</tbody></table>');
+ }));
+};
+LOADERS['managing_director/overview']=function(){return Promise.all([
+   API.get('/admin/dashboard').catch(function(){return{};}),
+   API.get('/admin/stats').catch(function(){return{};}),
+   API.get('/deals',{limit:50,sort:'-updated_at'}).catch(function(){return{items:[]};})
+ ]).then(function(r){STATE.cache['adminDash']=r[0];STATE.cache['adminStats']=r[1];STATE.cache['allDeals']=r[2];});};
+
+SCREENS['managing_director/approvals']=function(){
+ return topbar('Executive / <b>Approvals</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var items=pick(STATE.cache['approvals']);
+   if(!items.length)return ph('Pending Approvals','Deals escalated for executive sign-off appear here.')+panel('Queue',emptyBox('Nothing awaiting your approval.'));
+   var rows=items.map(function(a){var id=firstOf(a,'id','approval_id','request_id');var kind=firstOf(a,'type','approval_type','action','reason')||'Approval';var subj=firstOf(a,'deal_id','entity_id','subject','description')||'';var amt=firstOf(a,'amount','value');
+     return '<div class="doc"><div class="fic" style="background:var(--accent-soft);color:var(--accent)">\u2713</div><div style="flex:1"><div class="nm">'+esc(kind)+'</div><div class="tg">'+esc(String(subj).slice(0,28))+(amt!=null?' \u00B7 '+money(amt):'')+'</div></div><div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm" data-action="approve" data-id="'+esc(id)+'">Approve</button><button class="btn btn-ghost btn-sm" data-action="reject" data-id="'+esc(id)+'">Reject</button></div></div>';
+   }).join('');
+   return ph('Pending Approvals','Deals escalated for executive sign-off \u2014 approve or reject with an audit trail.')+panel('Queue \u00B7 '+items.length,rows);
+ }));
+};
+LOADERS['managing_director/approvals']=function(){return API.get('/approvals/pending',{limit:100}).then(function(d){STATE.cache['approvals']=d;STATE.pendingCount=pick(d).length;});};
+
+SCREENS['managing_director/users']=function(){
+ return topbar('Executive / <b>User Management</b>',search('Search users\u2026')+'<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var users=pick(STATE.cache['users']);
+   var rows=users.length?users.map(function(u){var nm=firstOf(u,'company_name','name','full_name')||((firstOf(u,'first_name')||'')+' '+(firstOf(u,'last_name')||'')).trim()||firstOf(u,'email')||'\u2014';var em=firstOf(u,'email')||'';var ro=firstOf(u,'role')||'';var act=firstOf(u,'is_active','active');
+     return '<tr><td>'+esc(nm)+'</td><td class="muted">'+esc(em)+'</td><td>'+stateBadge(ro)+'</td><td>'+badge(act===false?'b-warn':'b-ok',act===false?'Inactive':'Active')+'</td></tr>';
+   }).join(''):'<tr><td colspan="4"><div class="empty">No users.</div></td></tr>';
+   return ph('User Management','Every counterparty and staff member with platform access.')+
+   '<div class="panel" style="max-width:760px;margin-bottom:16px"><div class="panel-h"><h3>Invite a user</h3></div><div class="form-grid" style="grid-template-columns:1fr 1fr">'+
+   field('Email','<input class="input" id="usr_email" type="email" placeholder="person@company.com">')+
+   field('Role','<select class="input" id="usr_role"><option value="buyer">Buyer</option><option value="supplier">Supplier</option><option value="trader">Trader</option><option value="finance_officer">Finance officer</option><option value="compliance_officer">Compliance officer</option><option value="operations_manager">Operations manager</option><option value="inspector">Inspector</option><option value="managing_director">Managing director</option></select>')+
+   '</div><div class="form-foot"><button class="btn btn-accent" data-action="invite">Send invite</button></div></div>'+
+   panel('All users \u00B7 '+users.length,'<table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table>');
+ }));
+};
+LOADERS['managing_director/users']=function(){return API.get('/admin/users',{limit:200}).then(function(d){STATE.cache['users']=d;});};
+
+SCREENS['managing_director/config']=function(){
+ return topbar('Executive / <b>Configuration</b>','<div class="tb-actions">'+bell(STATE.unread)+'</div>')+
+ body(guard(function(){
+   var cfg=STATE.cache['config']||{};var states=pick(STATE.cache['states']);
+   var rows=Object.keys(cfg).filter(function(k){return typeof cfg[k]!=='object';}).map(function(k){return '<div class="sum-row"><span class="k">'+esc(k.replace(/_/g,' '))+'</span><span class="v">'+esc(String(cfg[k]))+'</span></div>';}).join('')||'<div class="empty">No scalar config returned.</div>';
+   var stchips=(states.length?states:STATE_ORDER).map(function(s){var name=(typeof s==='string')?s:(firstOf(s,'name','state','key')||'');return '<span class="pill" style="cursor:default">'+esc(stMeta(name).l)+'</span>';}).join('');
+   return ph('Platform Configuration','Brand, platform metadata and the deal-state machine \u2014 sourced live from the backend config.')+
+   '<div class="grid-2"><div>'+panel('Platform config','<div class="sum">'+rows+'</div>')+'</div>'+
+   '<div>'+panel('Deal states \u00B7 '+(states.length||STATE_ORDER.length),'<div class="pills" style="margin:0">'+stchips+'</div>')+'</div></div>';
+ }));
+};
+LOADERS['managing_director/config']=function(){return Promise.all([API.get('/config').catch(function(){return{};}),API.get('/config/states').catch(function(){return{items:[]};})]).then(function(r){STATE.cache['config']=r[0];STATE.cache['states']=r[1];});};
+
+/* ================= DESIGN SYSTEM (static showcase) ================= */
+function designKit(){
+ var swatch=function(name,varname){return '<div style="flex:1;min-width:120px"><div style="height:64px;border-radius:10px;background:var('+varname+');border:1px solid var(--n200)"></div><div style="font-size:12px;font-weight:600;margin-top:7px">'+esc(name)+'</div><div class="muted" style="font-family:var(--mono);font-size:11px">var('+varname+')</div></div>';};
+ var states=STATE_ORDER.map(function(s){return stateBadge(s);}).join(' ');
+ return topbar('<b>Design System</b> \u00B7 Gazioil UI Kit','<div class="tb-actions"><button class="btn btn-ghost btn-sm" data-view="app">\u2190 Back to app</button></div>')+
+ body('<div>'+ph('Gazioil UI Kit','The shared visual language \u2014 brand tokens, typography, badges, buttons and core components used across all eight portals.')+
+ panel('Brand colours','<div style="display:flex;gap:14px;flex-wrap:wrap">'+swatch('Primary','--primary')+swatch('Secondary','--secondary')+swatch('Accent','--accent')+swatch('Success','--success')+swatch('Warning','--warning')+swatch('Danger','--danger')+'</div>')+
+ '<div class="grid-2"><div>'+panel('Typography','<div style="font-size:26px;font-weight:700;color:var(--n900)">IBM Plex Sans</div><div class="muted">Headings &amp; UI \u2014 400 / 500 / 600 / 700</div><div style="font-family:var(--mono);font-size:18px;margin-top:14px;color:var(--n900)">IBM Plex Mono 0123456789</div><div class="muted">Deal numbers, pricing, audit hashes</div>')+'</div>'+
+ '<div>'+panel('Buttons','<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button class="btn btn-primary">Primary</button><button class="btn btn-accent">Accent</button><button class="btn btn-ghost">Ghost</button><button class="btn btn-primary btn-sm">Small</button></div>')+'</div></div>'+
+ panel('Deal state badges \u00B7 27-state machine','<div style="display:flex;gap:8px;flex-wrap:wrap;line-height:2.2">'+states+'</div>')+
+ panel('KPI cards','<div class="kpi-row">'+kpi('var(--info-bg)','var(--info)','\u25A6','Active deals','12','+3 this week','up')+kpi('var(--accent-soft)','var(--accent)','\u2211','Commission','$1.2M','tracked','')+kpi('var(--success-bg)','var(--success)','\u2713','Closed','48','lifetime','')+'</div>')+
+ '</div>');
+}
+
+/* ================= SHELLS ================= */
+function switcher(){
+ var r=ROLEMAP[STATE.role];var portal=r?r.portal:'';
+ return '<div class="switcher"><span class="lbl">Signed in</span>'+
+   '<span class="rchip on">'+esc(portal)+'</span>'+
+   '<div class="sw-div"></div>'+
+   '<span class="rchip ds" data-view="design">Design System</span>'+
+   '<div class="sw-right"><span class="sw-user">'+esc(meName())+' \u00B7 '+esc(meRole())+'</span><span class="sw-out" data-action="logout">Sign out</span></div>'+
+ '</div>';
+}
+function roleSidebar(r){
+ if(!r)return '';
+ var items=r.items.map(function(it){var key=it[0];var active=(STATE.screen===key)?' active':'';
+   var nb=(key==='approvals'&&STATE.pendingCount)?'<span class="nbadge">'+STATE.pendingCount+'</span>':'';
+   return '<div class="nav-item'+active+'" data-screen="'+esc(key)+'"><span class="ic">'+it[1]+'</span>'+esc(it[2])+nb+'</div>';
+ }).join('');
+ var sharedNav='<div class="nav-item'+(STATE.screen==='notifications'?' active':'')+'" data-screen="notifications"><span class="ic">\uD83D\uDD14</span>Notifications'+(STATE.unread?'<span class="nbadge">'+STATE.unread+'</span>':'')+'</div>';
+ if(STATE.curDeal){sharedNav+='<div class="nav-item'+(STATE.screen==='deal'?' active':'')+'" data-screen="deal"><span class="ic">\u25A4</span>Current Deal</div>'+
+   '<div class="nav-item'+(STATE.screen==='messages'?' active':'')+'" data-screen="messages"><span class="ic">\u2709</span>Messages</div>';}
+ return '<div class="sidebar"><div class="brand"><div class="brand-mark">G</div><div><div class="brand-name">GAZIOIL</div><div class="brand-sub">'+esc(r.portal)+'</div></div></div>'+
+   '<div class="nav-group"><div class="nav-group-t">'+esc(r.portal)+'</div>'+items+'</div>'+
+   '<div class="nav-group"><div class="nav-group-t">Shared</div>'+sharedNav+'</div>'+
+   '<div class="nav-spacer"></div>'+
+   '<div class="nav-foot"><div class="ava">'+esc(meInitials())+'</div><div><div class="nm">'+esc(meName())+'</div><div class="rl">'+esc(meRole())+'</div></div></div>'+
+ '</div>';
+}
+function mobileShell(inner){
+ var screen=STATE.screen;
+ return '<div class="mobile-wrap"><div class="phone"><div class="phone-notch"></div>'+
+   '<div class="m-top"><div class="brand-mark">G</div><div><div class="tt">Inspector</div><div class="ts">GAZIOIL FIELD</div></div><div style="margin-left:auto" class="sw-out" data-action="logout">Exit</div></div>'+
+   '<div class="m-body">'+inner+'</div>'+
+   '<div class="m-tabbar"><div class="m-tab'+(screen==='jobs'||screen==='report'?' on':'')+'" data-screen="jobs"><span class="mi">\uD83D\uDCCB</span>Jobs</div><div class="m-tab'+(screen==='notifications'?' on':'')+'" data-screen="notifications"><span class="mi">\uD83D\uDD14</span>Alerts</div></div>'+
+ '</div>'+
+ '<div class="m-note"><b>Inspector portal</b> is mobile-first for use at the port or terminal. Pick a job, record observed quantity &amp; quality, attach the inspection certificate and submit \u2014 it posts straight to the deal\u2019s document set and audit timeline.</div></div>';
+}
+
+/* ================= ROUTER + RENDER ================= */
+function resolveScreenKey(){
+ var role=STATE.role,screen=STATE.screen;
+ var rk=role+'/'+screen;
+ if(SCREENS[rk])return rk;
+ if(SCREENS['shared/'+screen])return 'shared/'+screen;
+ return rk;
+}
+function loaderFor(sk){
+ var bare=(sk.indexOf('shared/')===0)?sk.slice(7):sk;
+ return LOADERS[sk]||LOADERS[bare];
+}
+function route(){
+ var sk=resolveScreenKey();STATE.curScreenKey=sk;
+ var loader=loaderFor(sk);
+ STATE.loading=true;STATE.error=null;render();
+ if(!loader){STATE.loading=false;render();return;}
+ Promise.resolve().then(function(){return loader();}).then(function(){
+   STATE.loading=false;render();
+ }).catch(function(e){
+   STATE.loading=false;STATE.error=e&&e.detail?e:{detail:(e&&e.message)||'Request failed'};render();
+ });
+}
+function render(){
+ var root=document.getElementById('root');if(!root)return;
+ if(STATE.view==='login'){root.innerHTML=renderLogin();return;}
+ if(STATE.view==='signup'){root.innerHTML=renderSignup();return;}
+ if(STATE.view==='mfa'){root.innerHTML=renderMfa();return;}
+ if(STATE.view==='design'){root.innerHTML=switcher()+'<div class="app" style="grid-template-columns:1fr"><div class="main">'+designKit()+'</div></div>';return;}
+ var r=ROLEMAP[STATE.role];
+ var sk=STATE.curScreenKey||resolveScreenKey();
+ var fn=SCREENS[sk]||function(){return (r&&r.mobile)?'<div class="m-card"><div class="pn">Not found</div></div>':(topbar('<b>Not found</b>','')+body(emptyBox('Screen \u201C'+esc(sk)+'\u201D is not available.')));};
+ var inner=fn();
+ if(r&&r.mobile){root.innerHTML=switcher()+mobileShell(inner);return;}
+ root.innerHTML=switcher()+'<div class="app">'+roleSidebar(r)+'<div class="main">'+inner+'</div></div>';
+}
+
+/* ================= INPUT HELPERS ================= */
+function val(id){var el=document.getElementById(id);return el?String(el.value).trim():'';}
+function numv(id){var v=val(id);return v===''?undefined:Number(v);}
+function fileOf(id){var el=document.getElementById(id);return (el&&el.files&&el.files[0])||null;}
+function busy(btn,on){if(!btn)return;if(on){btn._t=btn.textContent;btn.disabled=true;btn.textContent='Working\u2026';}else{btn.disabled=false;if(btn._t!=null)btn.textContent=btn._t;}}
+var _tt;
+function toast(msg,isErr){var el=document.getElementById('toast');if(!el)return;el.innerHTML='<span class="tk">'+(isErr?'\u26A0':'\u2713')+'</span>'+esc(msg);el.className='toast show'+(isErr?' err':'');clearTimeout(_tt);_tt=setTimeout(function(){el.className='toast'+(isErr?' err':'');},3400);}
+function apiErr(e){return (e&&e.detail)||(e&&e.message)||'Request failed';}
+/* run a mutating call: toast + refresh current screen (or custom after) */
+function run(btn,promise,okMsg,after){
+ busy(btn,true);
+ return promise.then(function(res){busy(btn,false);if(okMsg)toast(okMsg);if(after){after(res);}else{route();}return res;})
+   .catch(function(e){busy(btn,false);toast(apiErr(e),true);throw e;});
+}
+function needDeal(){if(!STATE.curDeal){toast('Select a deal first.',true);return false;}return true;}
+
+/* resolve profile after auth, route to role's default screen */
+function enterApp(){
+ return API.me().then(function(me){
+   ME=me;STATE.me=me;try{store.set('gz_me',JSON.stringify(me));}catch(e){}
+   STATE.role=resolvePortal(firstOf(me,'role')||'');
+   var r=ROLEMAP[STATE.role];STATE.screen=r?r.def:'pipeline';
+   STATE.view='app';STATE.error=null;STATE.mfaToken=null;
+   API.get('/notifications/in-app',{unread_only:true,limit:50}).then(function(d){STATE.unread=pick(d).length;var root=document.getElementById('root');if(root&&STATE.view==='app')render();}).catch(function(){});
+   route();
+ });
+}
+
+/* ================= EVENT DELEGATION ================= */
+document.addEventListener('click',function(e){
+ var t=e.target.closest('[data-action],[data-view],[data-pickdeal],[data-deal],[data-screen],[data-fillemail]');
+ if(!t)return;
+ if(t.hasAttribute('data-fillemail')){var el=document.getElementById('loginEmail');if(el){el.value=t.getAttribute('data-fillemail');el.focus();}return;}
+ if(t.hasAttribute('data-action')){e.preventDefault();action(t.getAttribute('data-action'),t);return;}
+ if(t.hasAttribute('data-view')){var v=t.getAttribute('data-view');if(v==='login'||v==='signup')STATE.error=null;STATE.view=v;render();return;}
+ if(t.hasAttribute('data-deal')){STATE.curDeal=t.getAttribute('data-deal');STATE.screen=t.getAttribute('data-screen')||'deal';STATE.showRaw=false;route();return;}
+ if(t.hasAttribute('data-pickdeal')){STATE.curDeal=t.getAttribute('data-pickdeal');route();return;}
+ if(t.hasAttribute('data-screen')){STATE.screen=t.getAttribute('data-screen');route();return;}
+});
+/* Enter key submits login / signup / mfa / message */
+document.addEventListener('keydown',function(e){
+ if(e.key!=='Enter')return;
+ var id=e.target&&e.target.id;
+ if(id==='loginPass'||id==='loginEmail'){e.preventDefault();action('signin',document.getElementById('loginBtn'));}
+ else if(id==='su_pass2'||id==='su_pass'||id==='su_email'||id==='su_company'){e.preventDefault();action('signup',document.getElementById('signupBtn'));}
+ else if(id==='mfaCode'){e.preventDefault();action('mfa-verify',null);}
+ else if(id==='msgInput'){e.preventDefault();action('send',null);}
+});
+
+/* ================= ACTION DISPATCH (real API) ================= */
+function action(name,btn){
+ switch(name){
+  case 'signin':{
+   var email=val('loginEmail'),pass=val('loginPass');
+   if(!email||!pass){toast('Enter email and password.',true);return;}
+   busy(btn,true);
+   API.login(email,pass).then(function(r){
+     if(r.mfa){busy(btn,false);STATE.mfaToken=r.mfa_token;STATE.view='mfa';STATE.error=null;render();return;}
+     return enterApp().then(function(){busy(btn,false);});
+   }).catch(function(e){busy(btn,false);STATE.error={detail:apiErr(e)};render();});
+   return;}
+  case 'signup':{
+   var sc=val('su_company'),se=val('su_email'),sp=val('su_pass'),sp2=val('su_pass2'),srole=val('su_role');
+   if(!sc||!se||!sp){toast('Company, email and password are required.',true);return;}
+   if(sp.length<8){toast('Password must be at least 8 characters.',true);return;}
+   if(sp!==sp2){toast('Passwords do not match.',true);return;}
+   var rbody={email:se,password:sp,role:srole,company_name:sc};
+   var scontact=val('su_contact');if(scontact)rbody.contact_name=scontact;
+   var scountry=val('su_country');if(scountry)rbody.country=scountry;
+   busy(btn,true);
+   API.register(rbody).then(function(r){
+     if(r.auto){return enterApp().then(function(){busy(btn,false);});}
+     busy(btn,false);STATE.view='login';STATE.error=null;render();toast('Account created \u2014 please sign in.');
+   }).catch(function(e){busy(btn,false);STATE.error={detail:apiErr(e)};render();});
+   return;}
+  case 'mfa-verify':{
+   var code=val('mfaCode');if(!code){toast('Enter your code.',true);return;}
+   busy(btn,true);
+   API.mfaLogin(STATE.mfaToken,code).then(function(){return enterApp();}).then(function(){busy(btn,false);})
+     .catch(function(e){busy(btn,false);STATE.error={detail:apiErr(e)};render();});
+   return;}
+  case 'logout':{
+   API.clear();ME=null;STATE.me=null;STATE.role=null;STATE.curDeal=null;STATE.view='login';STATE.error=null;STATE.cache={};STATE.unread=0;render();return;}
+
+  case 'loi':{
+   var body={product_type:val('loi_product'),quantity_mt:numv('loi_qty'),incoterm:val('loi_incoterm')};
+   if(!body.product_type||body.quantity_mt==null||!body.incoterm){toast('Product, quantity and incoterm are required.',true);return;}
+   var opt={payment_terms:val('loi_payment'),load_port:val('loi_load'),discharge_port:val('loi_disch'),quantity_tolerance_pct:numv('loi_tol'),target_price:numv('loi_target'),notes:val('loi_notes')};
+   for(var k in opt){if(opt[k]!==undefined&&opt[k]!=='')body[k]=opt[k];}
+   run(btn,API.post('/buyer/loi',body),'LOI submitted \u2014 deal created.',function(){STATE.screen='deals';route();});
+   return;}
+  case 'sign':{
+   if(!needDeal())return;
+   run(btn,API.post('/deals/'+STATE.curDeal+'/sign-ncnda',{}),'NCNDA signed.',function(){STATE.signed=true;route();});
+   return;}
+  case 'icpo':{
+   if(!needDeal())return;
+   var note='ICPO \u2014 qty '+val('icpo_qty')+' MT, target '+val('icpo_price')+', bank '+val('icpo_bank')+', validity '+val('icpo_validity')+'d';
+   run(btn,API.post('/deals/'+STATE.curDeal+'/notes',{note:note,content:note}).catch(function(){return null;}).then(function(){return API.post('/deals/'+STATE.curDeal+'/transition',{to_state:'icpo_received',reason:'ICPO submitted by buyer'});}),'ICPO submitted.');
+   return;}
+  case 'confirm-delivery':{
+   if(!needDeal())return;
+   run(btn,API.post('/buyer/confirm-delivery/'+STATE.curDeal,{notes:val('del_notes')}),'Delivery confirmed.');
+   return;}
+  case 'dispute':{
+   if(!needDeal())return;
+   var db={dispute_type:val('disp_type')||'quality',reason:val('disp_reason')};
+   var amt=numv('disp_amount');if(amt!=null)db.claim_amount=amt;
+   if(!db.reason){toast('Describe the dispute reason.',true);return;}
+   run(btn,API.post('/disputes/'+STATE.curDeal,db),'Dispute filed.');
+   return;}
+
+  case 'offer':{
+   if(!needDeal())return;
+   var ob={deal_id:STATE.curDeal,pricing_formula:val('off_formula'),differential:numv('off_diff'),incoterm:val('off_incoterm'),validity_days:numv('off_validity'),notes:val('off_notes')};
+   if(!ob.pricing_formula){toast('Enter a pricing formula.',true);return;}
+   run(btn,API.post('/supplier/offers',ob),'Offer submitted.',function(){STATE.screen='myoffers';route();});
+   return;}
+  case 'upload-supplier-doc':{
+   if(!needDeal())return;
+   var sf=fileOf('sd_file');if(!sf){toast('Choose a file.',true);return;}
+   var sfd=new FormData();sfd.append('file',sf);
+   run(btn,API.postForm('/supplier/documents'+API.qs({deal_id:STATE.curDeal,doc_type:val('sd_tag')||'other'}),sfd),'Document uploaded.');
+   return;}
+
+  case 'fco':{
+   if(!needDeal())return;
+   var fb={supplier_id:val('fco_supplier'),loading_port:val('fco_load'),buy_pricing_formula:val('fco_buy'),sell_pricing_formula:val('fco_sell'),buy_incoterm:val('fco_buyinc'),sell_incoterm:val('fco_sellinc')};
+   if(!fb.supplier_id||!fb.buy_pricing_formula){toast('Supplier and buy pricing formula are required.',true);return;}
+   run(btn,API.post('/deals/'+STATE.curDeal+'/issue-fco',fb),'FCO issued.');
+   return;}
+  case 'fix':{
+   if(!needDeal())return;
+   var leg=btn&&btn.getAttribute('data-leg');
+   if(!leg){toast('No leg selected to price.',true);return;}
+   var price=numv('fix_price');if(price==null){toast('Enter the final price.',true);return;}
+   var fb2={final_price:price};var fd=val('fix_date');if(fd)fb2.fixation_date=fd;var fn=val('fix_notes');if(fn)fb2.notes=fn;
+   run(btn,API.post('/pricing/legs/'+leg+'/fix-price',fb2),'Price fixed.');
+   return;}
+  case 'advance':{
+   if(!needDeal())return;
+   var next=btn&&btn.getAttribute('data-next');if(!next){toast('No next state.',true);return;}
+   run(btn,API.post('/deals/'+STATE.curDeal+'/transition',{to_state:next,reason:'Advanced via trading desk'}),'Advanced to '+stMeta(next).l+'.');
+   return;}
+
+  case 'approve-kyc':
+  case 'reject-kyc':{
+   var chk=btn&&btn.getAttribute('data-check');if(!chk){toast('No KYC check selected.',true);return;}
+   var ok=(name==='approve-kyc');
+   run(btn,API.post('/kyc/admin/'+chk+'/review',{approved:ok,reason:ok?'Approved':'Rejected by compliance'}),ok?'KYC approved.':'KYC rejected.');
+   return;}
+  case 'screen':{
+   var nm=val('scr_name');if(!nm){toast('Enter an entity name to screen.',true);return;}
+   run(btn,API.post('/kyc/screen',{entity_name:nm,name:nm,country:val('scr_country')}),'Screening submitted.');
+   return;}
+
+  case 'invoice':{
+   var comm=btn&&btn.getAttribute('data-comm');if(!comm){toast('No commission selected.',true);return;}
+   run(btn,API.post('/commissions/'+comm+'/mark-invoiced',{}),'Marked as invoiced.');
+   return;}
+  case 'confirm-payment':{
+   var pay=btn&&btn.getAttribute('data-pay');if(!pay){toast('No payment selected.',true);return;}
+   run(btn,API.patch('/payments/'+pay+'/status',{status:'confirmed',notes:'Confirmed by finance'}),'Payment confirmed.');
+   return;}
+
+  case 'lc':{
+   if(!needDeal())return;
+   var lb={lc_number:val('lc_number'),issuing_bank:val('lc_bank'),beneficiary_bank:val('lc_benbank'),amount:numv('lc_amount'),expiry_date:val('lc_expiry'),lc_type:val('lc_type')};
+   if(!lb.lc_number||!lb.issuing_bank){toast('LC number and issuing bank are required.',true);return;}
+   run(btn,API.post('/lc-real/'+STATE.curDeal,lb),'LC recorded.');
+   return;}
+  case 'upload-doc':{
+   if(!needDeal())return;
+   var f=fileOf('op_file');if(!f){toast('Choose a file.',true);return;}
+   var tag=val('op_tag');if(!tag){toast('Enter a document tag.',true);return;}
+   var fd2=new FormData();fd2.append('file',f);fd2.append('tag',tag);
+   run(btn,API.postForm('/deals/'+STATE.curDeal+'/documents',fd2),'Document uploaded.');
+   return;}
+
+  case 'approve':
+  case 'reject':{
+   var id=btn&&btn.getAttribute('data-id');if(!id){toast('No approval selected.',true);return;}
+   var path='/approvals/'+id+'/'+(name==='approve'?'approve':'reject');
+   run(btn,API.post(path,{reason:name==='approve'?'Approved by MD':'Rejected by MD'}),name==='approve'?'Approved.':'Rejected.');
+   return;}
+  case 'invite':{
+   var em=val('usr_email');if(!em){toast('Enter an email.',true);return;}
+   run(btn,API.post('/admin/users',{email:em,role:val('usr_role')}),'Invite sent.',function(){STATE.screen='users';route();});
+   return;}
+
+  case 'readall':{
+   run(btn,API.post('/notifications/in-app/read-all',{}),'All notifications marked read.',function(){STATE.unread=0;route();});
+   return;}
+  case 'send':{
+   if(!needDeal())return;
+   var msg=val('msgInput');if(!msg)return;
+   run(btn,API.post('/messages/deal/'+STATE.curDeal,{content:msg,deal_id:STATE.curDeal}),null);
+   return;}
+  case 'toggle-raw':{STATE.showRaw=!STATE.showRaw;render();return;}
+
+  case 'inspect-submit':{
+   if(!needDeal())return;
+   var insf=fileOf('insp_file');
+   var note='Inspection \u2014 observed qty '+val('insp_qty')+' MT; quality '+val('insp_quality')+'. '+val('insp_notes');
+   var chain;
+   if(insf){var ifd=new FormData();ifd.append('file',insf);ifd.append('tag','inspection_report');chain=API.postForm('/deals/'+STATE.curDeal+'/documents',ifd);}
+   else{chain=Promise.resolve();}
+   chain=chain.then(function(){return API.post('/deals/'+STATE.curDeal+'/notes',{note:note,content:note});});
+   run(btn,chain,'Inspection report submitted.',function(){STATE.screen='jobs';route();});
+   return;}
+
+  case 'ping':{
+   var el=document.getElementById('connStatus');
+   var mono='font-family:var(--mono)';
+   function diag(color,html){if(el){el.style.color='var(--'+color+')';el.innerHTML=html;}}
+   // 1) file:// origin can NEVER reach the API \u2014 browsers block all fetches from file://.
+   if(location.protocol==='file:'){
+     diag('danger','\u2715 This page is open as <b style="'+mono+'">file://</b>. Browsers block every network call from file:// origins, so the API can never be reached this way \u2014 the server itself is fine. Serve it over http: run <b style="'+mono+'">python3 -m http.server</b> in this folder, then open <b style="'+mono+'">http://localhost:8000/gazioil-platform.html</b>.');
+     return;
+   }
+   diag('n400','Checking '+esc(API.base)+' \u2026 (first hit on a sleeping Render service can take ~50s)');
+   var t0=Date.now();
+   // 2) REAL cross-origin GET to a known endpoint. Any HTTP status (200/401/404)
+   //    proves the host is reachable AND CORS is configured for this origin.
+   //    A thrown TypeError = CORS block, offline, or blocked by a proxy/extension.
+   var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
+   var timer=setTimeout(function(){if(ctrl)ctrl.abort();},20000);
+   fetch(API._proxy+encodeURIComponent(API.base+'/auth/me'),{method:'GET',headers:{'Authorization':'Bearer connectivity-probe'},signal:ctrl?ctrl.signal:undefined})
+    .then(function(res){
+      clearTimeout(timer);
+      var ms=Date.now()-t0;
+      diag('success','\u2713 Connected to <b style="'+mono+'">'+esc(API.base)+'</b> \u2014 HTTP '+res.status+' in '+ms+' ms. The server is reachable and CORS is allowing this origin (<b style="'+mono+'">'+esc(location.origin||'null')+'</b>). Sign-in should work.');
+    })
+    .catch(function(err){
+      clearTimeout(timer);
+      var ms=Date.now()-t0;
+      var aborted=err&&err.name==='AbortError';
+      if(aborted){
+        diag('warning','\u23F3 No response after 20s. If this is the first request, the Render free-tier service is likely still waking \u2014 open <b style="'+mono+'">https://api.gazioil.space/docs</b> in another tab to confirm it loads, then run this test again.');
+        return;
+      }
+      // Host is confirmed up (it serves Swagger at /docs), so a TypeError here is almost always CORS.
+      diag('danger','\u2715 The browser blocked the response from <b style="'+mono+'">'+esc(API.base)+'</b> (failed in '+ms+' ms). The host is reachable, so this is almost certainly a <b>CORS</b> problem: the API is not returning <b style="'+mono+'">Access-Control-Allow-Origin</b> for this origin (<b style="'+mono+'">'+esc(location.origin||'null')+'</b>). Fix it on the FastAPI backend \u2014 add CORSMiddleware allowing this origin (or <b style="'+mono+'">*</b>) and the <b style="'+mono+'">Authorization</b> + <b style="'+mono+'">Content-Type</b> headers so OPTIONS preflight passes. (A VPN, ad-blocker, or being offline would also cause this.)');
+    });
+   return;}
+  default:{toast('Unknown action: '+name,true);}
+ }
+}
+
+/* ================= BOOT ================= */
+function boot(){
+ if(API.token){
+   STATE.view='app';STATE.loading=true;
+   var cached=store.get('gz_me');if(cached){try{ME=JSON.parse(cached);STATE.me=ME;STATE.role=resolvePortal(firstOf(ME,'role')||'');}catch(e){}}
+   enterApp().catch(function(){API.clear();ME=null;STATE.me=null;STATE.role=null;STATE.view='login';STATE.error=null;render();});
+ }else{
+   STATE.view='login';render();
+ }
+}
+/* light unread polling (EventSource can't send auth header, so poll) */
+setInterval(function(){
+ if(STATE.view!=='app'||!API.token)return;
+ API.get('/notifications/in-app',{unread_only:true,limit:50}).then(function(d){
+   var n=pick(d).length;if(n!==STATE.unread){STATE.unread=n;if(STATE.view==='app')render();}
+ }).catch(function(){});
+},60000);
+
+boot();
+</script>
+</body>
+</html>
