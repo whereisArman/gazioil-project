@@ -280,7 +280,7 @@ var store={
 /* ---------- API client ---------- */
 var API={
   base:'https://api.gazioil.space/api/v1',
-_proxy:'https://corsproxy.io/?',
+_proxy: 'https://api.allorigins.win/raw?url=',
   token:store.get('gz_token')||'',
   refreshTok:store.get('gz_refresh')||'',
   setTokens:function(t,r){this.token=t||'';if(t)store.set('gz_token',t);if(r){this.refreshTok=r;store.set('gz_refresh',r);}},
