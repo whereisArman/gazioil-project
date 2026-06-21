@@ -51,7 +51,7 @@ button{font-family:var(--sans);cursor:pointer}svg{display:block}
 .nav-foot .rl{font:500 10px/1 var(--mono);color:#7e98ba;margin-top:2px}
 
 .main{display:flex;flex-direction:column;background:var(--n50);min-width:0}
-.topbar{height:58px;background:var(--n0);border-bottom:1px solid var(--n200);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:var(--topH);z-index:20}
+.topbar{height:58px;background:var(--n0);border-bottom:1px solid var(--n200);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:20}
 .crumb{font-size:13px;color:var(--n500)}.crumb b{color:var(--n800);font-weight:600}
 .searchbar{margin-left:6px;flex:1;max-width:380px;height:36px;background:var(--n100);border:1px solid var(--n200);border-radius:9px;display:flex;align-items:center;gap:9px;padding:0 12px;color:var(--n400);font-size:13px}
 .searchbar input{border:none;background:none;outline:none;flex:1;font-size:13px;color:var(--n700);font-family:var(--sans)}
@@ -481,18 +481,29 @@ function connNote(){
 function renderLogin(){
  var err=STATE.error?('<div class="auth-err">'+esc(STATE.error.detail||STATE.error)+'</div>'):'';
  return '<div class="main" style="background:var(--n50)">'+topbar('<b>Sign in</b> \u00B7 platform entry','')+
- '<div class="content"><div class="auth"><div class="auth-art"><div class="brand" style="border:none;padding:0"><div class="brand-mark">G</div><div><div class="brand-name">GAZIOIL</div><div class="brand-sub">TRADING DESK</div></div></div><div class="auth-tag">OMC Bilateral Trading Desk</div><div class="auth-h">The entire deal lifecycle.<br>One secure platform.</div><div class="auth-p">From Letter of Intent through price fixation to commission settlement \u2014 with a tamper-proof audit trail on every transition.</div><div class="auth-stats"><div><div class="v">300+</div><div class="l">API endpoints</div></div><div><div class="v">27</div><div class="l">Deal states</div></div><div><div class="v">8</div><div class="l">Roles \u00B7 RBAC</div></div></div></div>'+
+ '<div class="content"><div class="auth"><div class="auth-art">'+
+ /* --- ADJUSTED LOGO WRAPPER --- */
+ '<div class="brand" style="border:none;padding:100;margin-bottom:100px;margin-left:-30px">'+
+ '<img src="blue.png" alt="Gazioil Logo" style="max-width:90px;height:auto;display:block">'+
+ '</div>'+
+ /* ----------------------------- */
+ '<div class="auth-tag">OMC Bilateral Trading Desk</div><div class="auth-h">The entire deal lifecycle.<br>One secure platform.</div><div class="auth-p">From Letter of Intent through price fixation to commission settlement \u2014 with a tamper-proof audit trail on every transition.</div></div>'+
  '<div class="auth-form"><div style="font-size:22px;font-weight:700;color:var(--n900)">Sign in to your desk</div><p style="font-size:13px;color:var(--n500);margin:6px 0 18px">Live API \u00B7 api.gazioil.space \u2014 you are routed to your portal by role.</p>'+err+connNote()+
  field('Work email','<input class="input" id="loginEmail" type="email" placeholder="you@company.com" autocomplete="username">')+
  field('Password','<input class="input" id="loginPass" type="password" placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" autocomplete="current-password">')+
  '<button class="btn btn-primary" id="loginBtn" style="width:100%;height:44px;margin-top:6px" data-action="signin">Sign in</button>'+
- '<button class="btn btn-ghost" style="width:100%;margin-top:8px" data-action="ping">Test API connection</button>'+
  '<div class="auth-switch">New to Gazioil? <a data-view="signup">Create an account</a></div></div></div></div></div>';
 }
 function renderSignup(){
  var err=STATE.error?('<div class="auth-err">'+esc(STATE.error.detail||STATE.error)+'</div>'):'';
  return '<div class="main" style="background:var(--n50)">'+topbar('<b>Create account</b> \u00B7 counterparty registration','')+
- '<div class="content"><div class="auth"><div class="auth-art"><div class="brand" style="border:none;padding:0"><div class="brand-mark">G</div><div><div class="brand-name">GAZIOIL</div><div class="brand-sub">TRADING DESK</div></div></div><div class="auth-tag">OMC Bilateral Trading Desk</div><div class="auth-h">Register your company.<br>Start trading securely.</div><div class="auth-p">Create a counterparty account to submit Letters of Intent, respond to RFQs and track every deal through to settlement \u2014 all on a tamper-proof audit trail.</div><div class="auth-stats"><div><div class="v">KYC</div><div class="l">Verified onboarding</div></div><div><div class="v">SLA</div><div class="l">Desk-backed support</div></div></div></div>'+
+ '<div class="content"><div class="auth"><div class="auth-art">'+
+ /* --- UPDATED LOGO IMAGE --- */
+ '<div class="brand" style="border:none;padding:0;margin-bottom:24px;margin-left:-30px">'+
+ '<img src="blue.png" alt="Gazioil Logo" style="max-width:100px;height:auto;display:block">'+
+ '</div>'+
+ /* -------------------------- */
+ '<div class="auth-tag">OMC Bilateral Trading Desk</div><div class="auth-h">Register your company.<br>Start trading securely.</div><div class="auth-p">Create a counterparty account to submit Letters of Intent, respond to RFQs and track every deal through to settlement \u2014 all on a tamper-proof audit trail.</div></div>'+
  '<div class="auth-form"><div style="font-size:22px;font-weight:700;color:var(--n900)">Create your account</div><p style="font-size:13px;color:var(--n500);margin:6px 0 18px">Register as a buyer or supplier. Your account is verified before trading is enabled.</p>'+err+connNote()+
  field('Company name','<input class="input" id="su_company" type="text" placeholder="Your company Ltd." autocomplete="organization">')+
  field('Contact name','<input class="input" id="su_contact" type="text" placeholder="Full name" autocomplete="name">')+
@@ -1063,8 +1074,7 @@ function switcher(){
  return '<div class="switcher"><span class="lbl">Signed in</span>'+
    '<span class="rchip on">'+esc(portal)+'</span>'+
    '<div class="sw-div"></div>'+
-   '<span class="rchip ds" data-view="design">Design System</span>'+
-   '<div class="sw-right"><span class="sw-user">'+esc(meName())+' \u00B7 '+esc(meRole())+'</span><span class="sw-out" data-action="logout">Sign out</span></div>'+
+   '<div class="sw-right"><span class="sw-out" data-action="logout">Sign out</span></div>'+
  '</div>';
 }
 function roleSidebar(r){
@@ -1076,7 +1086,13 @@ function roleSidebar(r){
  var sharedNav='<div class="nav-item'+(STATE.screen==='notifications'?' active':'')+'" data-screen="notifications"><span class="ic">\uD83D\uDD14</span>Notifications'+(STATE.unread?'<span class="nbadge">'+STATE.unread+'</span>':'')+'</div>';
  if(STATE.curDeal){sharedNav+='<div class="nav-item'+(STATE.screen==='deal'?' active':'')+'" data-screen="deal"><span class="ic">\u25A4</span>Current Deal</div>'+
    '<div class="nav-item'+(STATE.screen==='messages'?' active':'')+'" data-screen="messages"><span class="ic">\u2709</span>Messages</div>';}
- return '<div class="sidebar"><div class="brand"><div class="brand-mark">G</div><div><div class="brand-name">GAZIOIL</div><div class="brand-sub">'+esc(r.portal)+'</div></div></div>'+
+ return '<div class="sidebar">'+
+   /* --- APP SIDEBAR LOGO SHIFTED LEFT --- */
+   '<div class="brand" style="border:none;padding:0;margin-bottom:16px;margin-left:-30px;display:flex;flex-direction:column;gap:4px">'+
+   '<img src="blue.png" alt="Gazioil Logo" style="max-width:120px;height:auto;display:block">'+
+   '<div class="brand-sub" style="margin-top:4px;margin-left:10px">'+esc(r.portal)+'</div>'+
+   '</div>'+
+   /* ------------------------------------- */
    '<div class="nav-group"><div class="nav-group-t">'+esc(r.portal)+'</div>'+items+'</div>'+
    '<div class="nav-group"><div class="nav-group-t">Shared</div>'+sharedNav+'</div>'+
    '<div class="nav-spacer"></div>'+
